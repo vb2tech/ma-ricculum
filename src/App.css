@@ -127,7 +127,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: #f8f9fa;
+  background: #0d1117;
 }
 
 .picker-header {
@@ -138,13 +138,13 @@ body {
 .picker-header h2 {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1a1a1a;
+  color: #e2e8f0;
   margin-bottom: 0.35rem;
 }
 
 .picker-header p {
   font-size: 0.95rem;
-  color: #888;
+  color: #64748b;
 }
 
 .picker-grid {
@@ -157,8 +157,8 @@ body {
 .picker-card {
   width: 200px;
   padding: 1.5rem 1.25rem;
-  background: #fff;
-  border: 2px solid #e5e7eb;
+  background: #161b22;
+  border: 2px solid #2d3748;
   border-radius: 16px;
   cursor: pointer;
   text-align: left;
@@ -170,19 +170,19 @@ body {
 
 .picker-card:hover {
   border-color: #cba6f7;
-  box-shadow: 0 4px 20px rgba(203,166,247,0.25);
+  box-shadow: 0 4px 24px rgba(203,166,247,0.15);
   transform: translateY(-2px);
 }
 
 .picker-card-name {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #1a1a1a;
+  color: #e2e8f0;
 }
 
 .picker-card-desc {
   font-size: 0.8rem;
-  color: #888;
+  color: #64748b;
   line-height: 1.4;
 }
 
