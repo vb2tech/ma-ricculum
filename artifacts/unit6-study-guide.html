@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accelerated 6 · Unit 6 Interactive Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--surf:#161b22;--s2:#1f2937;--border:#2d3748;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
+  --blue:#3b82f6;--green:#22c55e;--amber:#f59e0b;--orange:#f97316;--red:#ef4444;--purple:#a855f7;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+
+/* HEADER */
+#hdr{background:linear-gradient(180deg,#1a2035 0%,#0d1117 100%);border-bottom:1px solid var(--border);padding:18px 20px 0;position:sticky;top:0;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+h1{font-family:'Fredoka One',cursive;font-size:clamp(20px,3.5vw,30px);color:#fff;line-height:1.1}
+h1 span{background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:12px;color:var(--muted2);font-weight:700;margin-top:3px;letter-spacing:.5px}
+.prog-block{text-align:right;min-width:130px}
+.prog-lbl{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.prog-num{font-family:'Fredoka One',cursive;font-size:24px;color:#fff;line-height:1}
+.prog-sub{font-size:10px;color:var(--muted2);font-weight:700;margin-bottom:5px}
+.prog-bar{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px;transition:width .5s ease;width:0}
+
+/* TABS */
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:9px 14px;border-radius:8px 8px 0 0;background:transparent;border:1px solid transparent;border-bottom:none;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .18s;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.tab-btn.active{background:var(--surf);color:#fff;border-color:var(--border);border-bottom-color:var(--surf)}
+.tab-num{width:18px;height:18px;border-radius:50%;background:var(--s2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.tab-btn.active .tab-num{background:var(--blue);color:#fff}
+
+/* CONTENT */
+.content{max-width:840px;margin:0 auto;padding:28px 16px 100px}
+.sec-panel{display:none}.sec-panel.active{display:block}
+.sec-title{font-family:'Fredoka One',cursive;font-size:clamp(20px,3vw,26px);color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.concept-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.22);border-left:4px solid var(--blue);border-radius:10px;padding:14px 18px;font-size:14px;font-weight:600;color:#93c5fd;line-height:1.6;margin-bottom:24px}
+.concept-box em{color:#bfdbfe;font-style:normal;font-weight:900}
+
+/* CARDS */
+.card{border-radius:12px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;cursor:pointer;user-select:none}
+.card-hdr:hover{filter:brightness(1.07)}
+.tier-left{display:flex;align-items:center;gap:10px}
+.tier-icon{font-size:24px;flex-shrink:0}
+.tier-name{font-family:'Fredoka One',cursive;font-size:17px;color:#fff}
+.tier-sub{font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-top:1px}
+.card-right{display:flex;align-items:center;gap:8px}
+.done-pill{display:none;align-items:center;gap:4px;padding:4px 10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:20px;font-size:11px;font-weight:800;color:#86efac}
+.done-pill.show{display:inline-flex}
+.chev{font-size:14px;color:rgba(255,255,255,.45);transition:transform .25s}
+.card-hdr.open .chev{transform:rotate(180deg)}
+.t-worked .card-hdr{background:linear-gradient(135deg,#1e3a6e,#152d52)}.t-worked{border-color:rgba(59,130,246,.4)}
+.t-mild .card-hdr{background:linear-gradient(135deg,#14532d,#166534)}.t-mild{border-color:rgba(34,197,94,.4)}
+.t-medium .card-hdr{background:linear-gradient(135deg,#78350f,#92400e)}.t-medium{border-color:rgba(245,158,11,.4)}
+.t-spicy .card-hdr{background:linear-gradient(135deg,#7c2d12,#9a3412)}.t-spicy{border-color:rgba(249,115,22,.4)}
+.t-spicy2 .card-hdr{background:linear-gradient(135deg,#881d09,#a83215)}.t-spicy2{border-color:rgba(239,68,68,.35)}
+.t-extra .card-hdr{background:linear-gradient(135deg,#7f1d1d,#991b1b)}.t-extra{border-color:rgba(239,68,68,.4)}
+.t-super .card-hdr{background:linear-gradient(135deg,#4c1d95,#5b21b6)}.t-super{border-color:rgba(168,85,247,.4)}
+
+/* CARD BODY */
+.card-body{background:var(--surf);padding:20px;display:none;border-top:1px solid var(--border)}
+.card-body.open{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.problem{font-size:14.5px;line-height:1.8;color:var(--text);margin-bottom:16px}
+.problem strong{color:#fff;font-weight:900}
+.problem em{font-style:italic;color:#cbd5e1}
+.hint-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:11px 15px;font-size:13.5px;font-weight:700;color:#93c5fd;margin-bottom:16px;line-height:1.5}
+
+/* VISUAL BOXES */
+.vis-box{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:18px;overflow:hidden}
+.vis-title{background:rgba(255,255,255,.05);padding:10px 16px;font-size:12.5px;font-weight:800;color:#cbd5e1;letter-spacing:.3px;border-bottom:1px solid rgba(255,255,255,.06)}
+.vis-body{padding:16px}
+.vis-note{font-size:12.5px;font-weight:700;color:#94a3b8;margin-top:12px;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:6px;line-height:1.5}
+.vis-note strong{color:#e2e8f0}
+.rtable{width:100%;border-collapse:collapse;font-size:14px}
+.rtable th{background:rgba(59,130,246,.15);color:#93c5fd;font-weight:800;padding:8px 12px;text-align:center;font-size:13px}
+.rtable td{padding:7px 12px;text-align:center;font-weight:700;color:var(--text);border-top:1px solid rgba(255,255,255,.05)}
+.unit-row td{background:rgba(34,197,94,.1);color:#86efac;font-weight:900}
+.eq-row td{background:rgba(59,130,246,.1);color:#93c5fd;font-style:italic}
+.pe-vis{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 0;flex-wrap:wrap}
+.pe-fraction{text-align:center;font-size:15px;font-weight:700}
+.pe-top{color:#fca5a5;padding-bottom:6px}.pe-line{height:2px;background:#94a3b8}.pe-bot{color:#86efac;padding-top:6px}
+.pe-times{font-size:22px;font-weight:900;color:var(--amber)}
+.tape-wrap{display:flex;align-items:flex-start;gap:12px}
+.tape-label-l{font-size:12px;font-weight:800;color:var(--muted2);padding-top:8px;min-width:55px}
+.tape-bars{flex:1;display:flex;flex-direction:column;gap:8px}
+.tape-row{display:flex;height:38px}
+.tape-100{flex:5;background:rgba(59,130,246,.2);border:2px solid rgba(59,130,246,.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#93c5fd;border-radius:6px 0 0 6px}
+.tape-inc{flex:2;background:rgba(34,197,94,.2);border:2px solid rgba(34,197,94,.5);border-left:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#86efac;border-radius:0 6px 6px 0}
+.tape-only{flex:1;background:rgba(59,130,246,.2);border:2px solid rgba(59,130,246,.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#93c5fd;border-radius:6px}
+.fd-vis{display:flex;align-items:center;flex-wrap:wrap;gap:8px;justify-content:center}
+.fd-step{text-align:center;padding:10px 14px;background:rgba(255,255,255,.05);border-radius:10px;border:1px solid rgba(255,255,255,.1)}
+.fd-lbl{font-size:11px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.fd-expr{font-size:18px;font-weight:700;color:var(--text)}
+.fd-arrow{font-size:22px;color:var(--muted);font-weight:900}
+.fd-flip{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.fd-flip .fd-lbl{color:#fcd34d}.fd-flip .fd-expr{color:#fde68a}
+.fd-ans{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08)}
+.fd-ans .fd-lbl{color:#86efac}.fd-ans .fd-expr{color:#86efac}
+.disc-bar-wrap{display:flex;flex-direction:column;gap:8px}
+.disc-bar-row{display:flex;height:40px}
+.disc-orig-full{flex:1;background:rgba(148,163,184,.12);border:2px solid rgba(148,163,184,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#cbd5e1;border-radius:8px}
+.disc-pay{flex:7;background:rgba(59,130,246,.18);border:2px solid rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#93c5fd;border-radius:8px 0 0 8px}
+.disc-save{flex:3;background:rgba(34,197,94,.18);border:2px solid rgba(34,197,94,.4);border-left:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#86efac;border-radius:0 8px 8px 0}
+.flow-vis{display:flex;flex-direction:column;align-items:center;gap:0}
+.flow-node{padding:10px 24px;border-radius:10px;font-size:14px;font-weight:800;text-align:center;min-width:180px}
+.flow-node.orig{background:rgba(148,163,184,.12);border:2px solid rgba(148,163,184,.35);color:#cbd5e1}
+.flow-node.sale{background:rgba(245,158,11,.12);border:2px solid rgba(245,158,11,.4);color:#fde68a}
+.flow-node.final{background:rgba(34,197,94,.12);border:2px solid rgba(34,197,94,.4);color:#86efac}
+.flow-arrow-down{font-size:12px;font-weight:700;color:var(--muted2);padding:6px 0;text-align:center}
+.formula-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:520px){.formula-trio{grid-template-columns:1fr}}
+.ftrio-card{border-radius:10px;padding:12px;text-align:center;border:1px solid}
+.ftrio-blue{background:rgba(59,130,246,.09);border-color:rgba(59,130,246,.3)}
+.ftrio-amber{background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.3)}
+.ftrio-green{background:rgba(34,197,94,.09);border-color:rgba(34,197,94,.3)}
+.ftrio-icon{font-size:22px;margin-bottom:4px}
+.ftrio-title{font-size:12px;font-weight:900;margin-bottom:6px}
+.ftrio-blue .ftrio-title{color:#93c5fd}.ftrio-amber .ftrio-title{color:#fde68a}.ftrio-green .ftrio-title{color:#86efac}
+.ftrio-formula{font-size:11.5px;font-weight:700;line-height:1.6}
+.ftrio-blue .ftrio-formula{color:#bfdbfe}.ftrio-amber .ftrio-formula{color:#fef3c7}.ftrio-green .ftrio-formula{color:#d1fae5}
+
+/* STEPS */
+.steps{margin-bottom:16px}
+.step{margin-bottom:14px;padding:14px;background:var(--s2);border-radius:10px;border:1px solid var(--border)}
+.step-lbl{font-size:11.5px;font-weight:900;color:var(--muted2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.check-input-row{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.check-input{flex:1;min-width:180px;padding:9px 13px;background:var(--bg);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;transition:border-color .18s}
+.check-input:focus{outline:none;border-color:var(--blue)}
+.check-input[disabled]{opacity:.65;cursor:default;background:rgba(255,255,255,.03)}
+.check-input.shake{border-color:var(--red)!important;animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.check-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s;white-space:nowrap;min-width:110px;justify-content:center}
+.check-btn:hover:not([disabled]){background:linear-gradient(135deg,#2563eb,#3b82f6);transform:translateY(-1px)}
+.check-btn[disabled]{opacity:.6;cursor:default;transform:none}
+.check-btn.correct{background:linear-gradient(135deg,#15803d,#16a34a)!important}
+.step-ans{padding:11px 15px;border-radius:8px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.22);font-size:14px;font-weight:700;color:#93c5fd;display:none;line-height:1.65;margin-top:8px}
+.step-ans.show{display:block;animation:fadeIn .2s ease}
+
+/* AI FEEDBACK */
+.ai-fb-wrap{margin-top:10px;display:none}
+.ai-fb-wrap.show{display:block;animation:fadeIn .25s ease}
+.ai-correct{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px}
+.ai-wrong{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px}
+.ai-neutral{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.22);border-radius:10px}
+.ai-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.ai-text{font-size:13.5px;font-weight:700;line-height:1.6}
+.ai-correct .ai-text{color:#86efac}
+.ai-wrong .ai-text{color:#fca5a5}
+.ai-neutral .ai-text{color:#cbd5e1}
+.ai-guide{padding:14px 16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;margin-top:10px}
+.ai-guide-title{font-size:11.5px;font-weight:900;color:#fcd34d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.ai-guide-body{font-size:13.5px;font-weight:600;color:#fef3c7;line-height:1.75}
+.retry-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.retry-btn{padding:8px 16px;border-radius:8px;border:1px solid rgba(148,163,184,.3);background:rgba(148,163,184,.08);color:var(--muted2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s}
+.retry-btn:hover{background:rgba(148,163,184,.18);color:var(--text)}
+.show-step-btn{padding:8px 16px;border-radius:8px;border:none;background:rgba(168,85,247,.18);color:#d8b4fe;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s}
+.show-step-btn:hover{background:rgba(168,85,247,.32)}
+.attempt-note{font-size:12px;color:var(--muted2);font-weight:700}
+
+.tbl-input{width:50px;background:#0d1117;border:1px dashed #4b5563;color:#e2e8f0;text-align:center;border-radius:4px;padding:3px 4px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;transition:border-color .18s}
+.tbl-input:focus{border-color:#3b82f6;border-style:solid}
+.tbl-input-wide{width:70px}
+/* SPINNER */
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-sm{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
+
+/* MC */
+.mc-question{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:12px;padding:10px 14px;background:var(--s2);border-radius:8px;border-left:3px solid var(--blue)}
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media(max-width:480px){.mc-grid{grid-template-columns:1fr}}
+.mc-opt{padding:11px 15px;border:2px solid var(--border);border-radius:10px;background:var(--s2);color:var(--text);font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .18s;text-align:left;line-height:1.4}
+.mc-opt:hover:not([disabled]){border-color:var(--blue);background:rgba(59,130,246,.09);color:#bfdbfe}
+.mc-opt.correct{border-color:var(--green)!important;background:rgba(34,197,94,.12)!important;color:#86efac!important}
+.mc-opt.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.09)!important;color:#fca5a5!important}
+.mc-opt[disabled]{cursor:default}
+.mc-feedback{font-size:13.5px;font-weight:700;padding:11px 14px;border-radius:8px;margin-top:6px;display:none;line-height:1.6}
+.mc-feedback.ok{display:block;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.mc-feedback.no{display:block;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.mc-feedback.loading{display:block;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);color:#93c5fd}
+
+/* OPEN PARTS */
+.parts{margin-bottom:6px}
+.part{margin-bottom:14px;padding:14px;background:var(--s2);border-radius:10px;border:1px solid var(--border)}
+.part-q{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:10px;line-height:1.5}
+.part-q strong{color:#fff;font-weight:900}
+.work-hint{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;font-style:italic}
+.work-box{width:100%;min-height:68px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13.5px;resize:vertical;transition:border-color .18s}
+.work-box::placeholder{color:var(--muted)}
+.work-box:focus{outline:none;border-color:var(--purple)}
+.show-ans-btn{display:inline-flex;align-items:center;gap:6px;margin-top:9px;padding:8px 16px;border:none;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s;min-width:130px;justify-content:center}
+.show-ans-btn:hover:not([disabled]){background:linear-gradient(135deg,#7c3aed,#8b5cf6);transform:translateY(-1px)}
+.show-ans-btn[disabled]{opacity:.55;cursor:default;transform:none}
+.ans-reveal{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.22);border-radius:9px;padding:13px 15px;font-size:14px;font-weight:600;color:#d8b4fe;line-height:1.75;margin-top:9px;display:none}
+.ans-reveal.show{display:block;animation:fadeIn .2s ease}
+.ans-reveal strong{color:#e9d5ff;font-weight:900}
+.part-ai-fb{margin-top:10px}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <div class="hdr-top">
+    <div>
+      <h1>Unit 6 <span>Study Guide</span></h1>
+      <div class="subtitle">Accelerated 6 &nbsp;·&nbsp; Percentages &nbsp;·&nbsp; Proportional Relationships &nbsp;·&nbsp; Unit Rates</div>
+    </div>
+    <div class="prog-block">
+      <div class="prog-lbl">Progress</div>
+      <div class="prog-num" id="prog-count">0</div>
+      <div class="prog-sub" id="prog-sub">problems completed</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main class="content" id="sections"></main>
+
+<script>
+// ─── VISUALS ───────────────────────────────────────────────────────────────
+const VIS={
+v1:`<div class="vis-box"><div class="vis-title">📊 Ratio Table — Proportional Relationships</div><div class="vis-body"><table class="rtable"><thead><tr><th>Variable A (cups f)</th><th>Variable B (smoothies s)</th></tr></thead><tbody><tr><td>6 cups</td><td>4 smoothies</td></tr><tr class="unit-row"><td>1½ cups ← unit rate!</td><td>1 smoothie</td></tr><tr class="eq-row"><td><em>f</em></td><td><em>s</em> = (2/3)<em>f</em></td></tr></tbody></table><p class="vis-note">💡 The <strong>unit rate</strong> is always per 1. Find it by dividing! Then use it to write your equation.</p></div></div>`,
+v2:`<div class="vis-box"><div class="vis-title">📐 Percent Error — The Formula</div><div class="vis-body pe-vis"><div class="pe-fraction"><div class="pe-top">|measured &minus; actual|</div><div class="pe-line"></div><div class="pe-bot">actual (always this one!)</div></div><div class="pe-times">&times; 100%</div></div><div class="vis-body" style="padding-top:0"><p class="vis-note">⚠️ Always divide by the <strong>ACTUAL</strong> value. The | | bars mean the answer is always positive!</p></div></div>`,
+v3w:`<div class='vis-box'><div class='vis-title'>&#128207; Tape Diagram + Fill-In Table</div><div class='vis-body'><div style='width:100%;margin-bottom:14px'><div style='margin-bottom:6px'><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>Original:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px'>100% = 200</div><div style='flex:2'></div></div></div><div><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>New total:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px 0 0 6px'>100%</div><div class='tape-inc' style='flex:2;border-radius:0 6px 6px 0'>+40%</div></div></div><div style='display:flex;font-size:11px;font-weight:700;color:#94a3b8;margin-top:4px'><span style='flex:5;text-align:center'>original = 200</span><span style='flex:2;text-align:center;color:#86efac'>+40%</span></div></div><hr style='border:none;border-top:1px solid #2d3748;margin:12px 0'><p style='font-size:12px;font-weight:800;color:#93c5fd;margin-bottom:8px'>Find the New Amount &mdash; Fill in the Table:</p><table class='rtable' style='max-width:270px'><thead><tr><th>%</th><th>plants</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='200' data-hint='The original is 200 -- it always starts at 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='2' data-hint='200 / 100 = 2. Each 1% = 2 plants.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='140' data-hint='New% = 100% + 40% = 140%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='140' data-hint='The new total percent is 140% (100%+40%).' autocomplete='off'>%</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='280' data-hint='2 x 140 = 280. That is the new amount!' autocomplete='off'></td></tr></tbody></table><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>New% = 100% + 40% = <strong>140%</strong></p></div></div>`,
+v3mi:`<div class='vis-box'><div class='vis-title'>&#128207; Tape Diagram + Fill-In Table</div><div class='vis-body'><div style='width:100%;margin-bottom:14px'><div style='margin-bottom:6px'><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>Original:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px'>100% = 80</div><div style='flex:2'></div></div></div><div><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>New total:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px 0 0 6px'>100%</div><div class='tape-inc' style='flex:2;border-radius:0 6px 6px 0'>+25%</div></div></div><div style='display:flex;font-size:11px;font-weight:700;color:#94a3b8;margin-top:4px'><span style='flex:5;text-align:center'>original = 80</span><span style='flex:2;text-align:center;color:#86efac'>+25%</span></div></div><hr style='border:none;border-top:1px solid #2d3748;margin:12px 0'><p style='font-size:12px;font-weight:800;color:#93c5fd;margin-bottom:8px'>Find the New Amount &mdash; Fill in the Table:</p><table class='rtable' style='max-width:270px'><thead><tr><th>%</th><th>spaces</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='80' data-hint='The original is 80 -- it always starts at 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.8' data-hint='80 / 100 = 0.8. Each 1% = 0.8 spaces.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='125' data-hint='New% = 100% + 25% = 125%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='125' data-hint='The new total percent is 125% (100%+25%).' autocomplete='off'>%</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='100' data-hint='0.8 x 125 = 100. That is the new amount!' autocomplete='off'></td></tr></tbody></table><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>New% = 100% + 25% = <strong>125%</strong></p></div></div>`,
+v3me:`<div class='vis-box'><div class='vis-title'>&#128207; Tape Diagram + Fill-In Table</div><div class='vis-body'><div style='width:100%;margin-bottom:14px'><div style='margin-bottom:6px'><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>Original:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px'>100% = 60</div><div style='flex:2'></div></div></div><div><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>New total:</div><div style='display:flex;height:34px'><div class='tape-100' style='flex:5;border-radius:6px 0 0 6px'>100%</div><div class='tape-inc' style='flex:2;border-radius:0 6px 6px 0'>+35%</div></div></div><div style='display:flex;font-size:11px;font-weight:700;color:#94a3b8;margin-top:4px'><span style='flex:5;text-align:center'>original = 60</span><span style='flex:2;text-align:center;color:#86efac'>+35%</span></div></div><hr style='border:none;border-top:1px solid #2d3748;margin:12px 0'><p style='font-size:12px;font-weight:800;color:#93c5fd;margin-bottom:8px'>Find the New Amount &mdash; Fill in the Table:</p><table class='rtable' style='max-width:270px'><thead><tr><th>%</th><th>gallons</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='60' data-hint='The original is 60 -- it always starts at 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.6' data-hint='60 / 100 = 0.6. Each 1% = 0.6 gallons.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='135' data-hint='New% = 100% + 35% = 135%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='135' data-hint='The new total percent is 135% (100%+35%).' autocomplete='off'>%</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='81' data-hint='0.6 x 135 = 81. That is the new amount!' autocomplete='off'></td></tr></tbody></table><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>New% = 100% + 35% = <strong>135%</strong></p></div></div>`,
+v3:`<div class='vis-box'><div class='vis-title'>&#128207; Tape Diagram &mdash; Percent Increase</div><div class='vis-body'><div style='width:100%'><div style='margin-bottom:6px'><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>Original:</div><div style='display:flex;height:36px'><div class='tape-100' style='flex:5;border-radius:6px'>100% = original amount</div><div style='flex:2'></div></div></div><div><div style='font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:3px'>New total:</div><div style='display:flex;height:36px'><div class='tape-100' style='flex:5;border-radius:6px 0 0 6px'>100%</div><div class='tape-inc' style='flex:2;border-radius:0 6px 6px 0'>+ increase%</div></div></div><div style='display:flex;font-size:11px;font-weight:700;color:#94a3b8;margin-top:5px'><span style='flex:5;text-align:center'>same as original</span><span style='flex:2;text-align:center;color:#86efac'>extra!</span></div></div><p class='vis-note'>&#128161; The new bar is LONGER than the original &mdash; that extra piece is the increase!</p></div></div>`,
+v4:`<div class="vis-box"><div class="vis-title">🔄 Dividing Fractions — Flip &amp; Multiply!</div><div class="vis-body"><div class="fd-vis"><div class="fd-step"><div class="fd-lbl">Division</div><div class="fd-expr"><sup>a</sup>/<sub>b</sub> &divide; <sup>c</sup>/<sub>d</sub></div></div><div class="fd-arrow">&#8594;</div><div class="fd-step fd-flip"><div class="fd-lbl">Flip 2nd fraction!</div><div class="fd-expr"><sup>a</sup>/<sub>b</sub> &times; <sup>d</sup>/<sub>c</sub></div></div><div class="fd-arrow">&#8594;</div><div class="fd-step fd-ans"><div class="fd-lbl">Multiply &amp; simplify</div><div class="fd-expr"><sup>a&times;d</sup>/<sub>b&times;c</sub></div></div></div><p class="vis-note">💡 Speed = distance &divide; time. Set up the division, then flip the second fraction and multiply!</p></div></div>`,
+v5:`<div class="vis-box"><div class="vis-title">🏷️ How Discounts Work — Visual Breakdown</div><div class="vis-body"><div class="disc-bar-wrap"><div class="disc-bar-row"><div class="disc-orig-full">Original Price = 100%</div></div><div class="disc-bar-row"><div class="disc-pay">You Pay (e.g. 70%)</div><div class="disc-save">Saved! (30%)</div></div></div><p class="vis-note">💡 To find the <strong>original price</strong> from a sale price: divide by the decimal you pay. ($42 at 30% off: $42 &divide; 0.70 = $60)</p></div></div>`,
+v6:`<div class="vis-box"><div class="vis-title">🧾 The Right Order: Discount FIRST, Then Tax</div><div class="vis-body"><div class="flow-vis"><div class="flow-node orig">💰 Original Price</div><div class="flow-arrow-down">&#8595; Step 1: Apply discount</div><div class="flow-node sale">✂️ Sale Price ← apply tax to THIS</div><div class="flow-arrow-down">&#8595; Step 2: Apply tax to sale price</div><div class="flow-node final">🧾 Final Price You Pay</div></div><p class="vis-note">⚠️ Tax is always applied to the <strong>sale price</strong>, never the original!</p></div></div>`,
+v6w:`<div class='vis-box'><div class='vis-title'>&#128202; Fill In Both Tables!</div><div class='vis-body' style='display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start'><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#fde68a;text-align:center;margin-bottom:6px'>OLD 100% &rarr; Sale Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='40' data-hint='The original price is $40 -- it equals 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.4' data-hint='40 / 100 = 0.4. Each 1% equals $0.4.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='75' data-hint='You pay 75% because 100% - 25% = 75%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='75' data-hint='Write 75 -- you pay 75% of the original.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='30.0' data-hint='0.4 x 75 = $30.0. That is your sale price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#fde68a;font-weight:700;margin-top:6px'>Pay%: 100%-25%</p></div><div style='display:flex;align-items:center;font-size:28px;color:#94a3b8;padding-top:24px'>&rarr;</div><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#93c5fd;text-align:center;margin-bottom:6px'>NEW 100% &rarr; Final Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='30.0' data-hint='Put the sale price here: $30.0. It is the New 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.3' data-hint='30.0 / 100 = 0.3. Each 1% equals $0.3.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='108' data-hint='108% because 100% + 8% tax = 108%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='108' data-hint='Write 108.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='32.4' data-hint='0.3 x 108 = $32.4. That is your final price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#93c5fd;font-weight:700;margin-top:6px'>New%: 100%+8%</p></div></div><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>&#128161; Transfer the sale price to the <strong>New 100%</strong> row!</p></div>`,
+v6mi:`<div class='vis-box'><div class='vis-title'>&#128202; Fill In Both Tables!</div><div class='vis-body' style='display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start'><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#fde68a;text-align:center;margin-bottom:6px'>OLD 100% &rarr; Sale Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='20' data-hint='The original price is $20 -- it equals 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.2' data-hint='20 / 100 = 0.2. Each 1% equals $0.2.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='90' data-hint='You pay 90% because 100% - 10% = 90%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='90' data-hint='Write 90 -- you pay 90% of the original.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='18.0' data-hint='0.2 x 90 = $18.0. That is your sale price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#fde68a;font-weight:700;margin-top:6px'>Pay%: 100%-10%</p></div><div style='display:flex;align-items:center;font-size:28px;color:#94a3b8;padding-top:24px'>&rarr;</div><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#93c5fd;text-align:center;margin-bottom:6px'>NEW 100% &rarr; Final Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='18.0' data-hint='Put the sale price here: $18.0. It is the New 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.18' data-hint='18.0 / 100 = 0.18. Each 1% equals $0.18.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='105' data-hint='105% because 100% + 5% tax = 105%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='105' data-hint='Write 105.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='18.9' data-hint='0.18 x 105 = $18.9. That is your final price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#93c5fd;font-weight:700;margin-top:6px'>New%: 100%+5%</p></div></div><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>&#128161; Transfer the sale price to the <strong>New 100%</strong> row!</p></div>`,
+v6me:`<div class='vis-box'><div class='vis-title'>&#128202; Fill In Both Tables!</div><div class='vis-body' style='display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start'><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#fde68a;text-align:center;margin-bottom:6px'>OLD 100% &rarr; Sale Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='16' data-hint='The original price is $16 -- it equals 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.16' data-hint='16 / 100 = 0.16. Each 1% equals $0.16.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='80' data-hint='You pay 80% because 100% - 20% = 80%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='80' data-hint='Write 80 -- you pay 80% of the original.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='12.8' data-hint='0.16 x 80 = $12.8. That is your sale price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#fde68a;font-weight:700;margin-top:6px'>Pay%: 100%-20%</p></div><div style='display:flex;align-items:center;font-size:28px;color:#94a3b8;padding-top:24px'>&rarr;</div><div style='flex:1;min-width:130px'><div style='font-size:12px;font-weight:900;color:#93c5fd;text-align:center;margin-bottom:6px'>NEW 100% &rarr; Final Price</div><table class='rtable'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='12.8' data-hint='Put the sale price here: $12.8. It is the New 100%.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;100 both sides &darr;</td></tr><tr class='unit-row'><td>1</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='0.128' data-hint='12.8 / 100 = 0.128. Each 1% equals $0.128.' autocomplete='off'></td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='106' data-hint='106% because 100% + 6% tax = 106%.' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='106' data-hint='Write 106.' autocomplete='off'>%</td><td>$<input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='13.57' data-hint='0.128 x 106 = $13.57. That is your final price!' autocomplete='off'></td></tr></tbody></table><p style='font-size:11px;color:#93c5fd;font-weight:700;margin-top:6px'>New%: 100%+6%</p></div></div><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div><p class='vis-note'>&#128161; Transfer the sale price to the <strong>New 100%</strong> row!</p></div>`,
+v7w:`<div class='vis-box'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='40' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='40' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='2.5' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='60' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='150' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='60' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='150' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='50' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7mi:`<div class='vis-box'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='10' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='10' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='10' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='15' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='150' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='15' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='150' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='50' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7me:`<div class='vis-box'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='40' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='40' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='2.5' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='56' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='140' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='56' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='140' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='40' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7w_b:`<div class='vis-box' style='margin-top:10px'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='40' data-hint='The cost is $40 -- what the store paid. Always equals 100%.' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='40' data-hint='Divide by the cost ($40). Same number as the cost!' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='2.5' data-hint='100 / 40 = 2.5. Each dollar equals 2.5%!' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='60' data-hint='Multiply by the selling price ($60).' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='150.0' data-hint='2.5 x 60 = 150.0. The selling price = 150.0% of cost.' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='60' data-hint='The selling price is $60.' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='150.0' data-hint='The selling % from the table above -- 150.0%.' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='50' data-hint='150.0 - 100 = 50. The markup is 50%!' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7mi_b:`<div class='vis-box' style='margin-top:10px'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='10' data-hint='The cost is $10 -- what the store paid. Always equals 100%.' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='10' data-hint='Divide by the cost ($10). Same number as the cost!' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='10.0' data-hint='100 / 10 = 10.0. Each dollar equals 10.0%!' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='15' data-hint='Multiply by the selling price ($15).' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='150.0' data-hint='10.0 x 15 = 150.0. The selling price = 150.0% of cost.' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='15' data-hint='The selling price is $15.' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='150.0' data-hint='The selling % from the table above -- 150.0%.' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='50' data-hint='150.0 - 100 = 50. The markup is 50%!' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7me_b:`<div class='vis-box' style='margin-top:10px'><div class='vis-title'>&#128202; Markup % Table &mdash; Fill It In!</div><div class='vis-body'><table class='rtable' style='max-width:280px'><thead><tr><th>%</th><th>$</th></tr></thead><tbody><tr><td>100</td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='40' data-hint='The cost is $40 -- what the store paid. Always equals 100%.' autocomplete='off'> &larr; cost</td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&divide;<input type='text' class='tbl-input' placeholder='?' data-answer='40' data-hint='Divide by the cost ($40). Same number as the cost!' autocomplete='off'> both sides &darr;</td></tr><tr class='unit-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='2.5' data-hint='100 / 40 = 2.5. Each dollar equals 2.5%!' autocomplete='off'></td><td style='font-weight:900'>1 &larr; $1 = ___% </td></tr><tr style='font-size:11px;color:#64748b'><td colspan='2' style='text-align:center;padding:2px'>&times;<input type='text' class='tbl-input' placeholder='?' data-answer='56' data-hint='Multiply by the selling price ($56).' autocomplete='off'> both sides &darr;</td></tr><tr class='eq-row'><td><input type='text' class='tbl-input' placeholder='?' data-answer='140.0' data-hint='2.5 x 56 = 140.0. The selling price = 140.0% of cost.' autocomplete='off'></td><td><input type='text' class='tbl-input tbl-input-wide' placeholder='?' data-answer='56' data-hint='The selling price is $56.' autocomplete='off'> &larr; sell price</td></tr></tbody></table><p style='font-size:12px;color:#fde68a;font-weight:700;margin-top:8px'>Markup% = <input type='text' class='tbl-input' placeholder='?' data-answer='140.0' data-hint='The selling % from the table above -- 140.0%.' autocomplete='off'> &minus; 100% = <strong><input type='text' class='tbl-input' placeholder='?' data-answer='40' data-hint='140.0 - 100 = 40. The markup is 40%!' autocomplete='off'>%</strong></p><div style='margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap'><button onclick='checkTableInputs(this)' class='check-btn' style='font-size:12px;padding:7px 16px'>&#10004; Check My Table</button><span class='tbl-fb' style='font-size:12px;font-weight:700;display:none'></span></div></div></div>`,
+v7:`<div class="vis-box"><div class="vis-title">💼 Three Key Formulas</div><div class="vis-body"><div class="formula-trio"><div class="ftrio-card ftrio-blue"><div class="ftrio-icon">💰</div><div class="ftrio-title">Commission</div><div class="ftrio-formula">rate &times; total sales</div></div><div class="ftrio-card ftrio-amber"><div class="ftrio-icon">📈</div><div class="ftrio-title">Markup %</div><div class="ftrio-formula">(sell &minus; cost) &divide; cost &times; 100%</div></div><div class="ftrio-card ftrio-green"><div class="ftrio-icon">⬆️</div><div class="ftrio-title">New Wage</div><div class="ftrio-formula">original &times; (1 + raise%)</div></div></div></div></div>`
+};
+
+// ─── DATA ──────────────────────────────────────────────────────────────────
+const DATA=[
+{title:"Percent Error",emoji:"📏",
+ concept:"Percent Error = |measured &minus; actual| &divide; actual &times; 100%.  Always divide by the <em>ACTUAL</em> value.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v2",
+   problem:`Leul measured the length of a textbook to be <strong>28 cm</strong>. The actual length is <strong>25 cm</strong>.`,
+   steps:[{label:"What am I wrong by? Find |measured &minus; actual|",ans:"|28 &minus; 25| = <strong>3</strong> (I was wrong by 3 cm)"},{label:"What is the 100%? (Always the ACTUAL value — the whole)",ans:"The actual length = <strong>25 cm = 100%</strong>"},{label:"What do you get when you do Part &divide; Whole? (Then &times; 100)",ans:"3 &divide; 25 = 0.12 &nbsp;&rarr;&nbsp; 0.12 &times; 100 = <strong>12%</strong>"}],
+   mcQ:"Which is closest to the percent error?",mc:["A.  10.7%","B.  12%","C.  89.3%","D.  112%"],mcA:1,mcE:"|28−25| ÷ 25 × 100 = 3/25 × 100 = 12% ✓"},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v2",
+   problem:`Sammy measured a pencil to be <strong>14 cm</strong> long. The actual length is <strong>15 cm</strong>.`,
+   hint:"Percent Error = |measured − actual| ÷ actual × 100%. Always divide by the ACTUAL value.",
+   steps:[{label:"What am I wrong by? Find |measured &minus; actual|",ans:"|14 &minus; 15| = <strong>1</strong> (wrong by 1 cm)"},{label:"What is the 100%? (Always the ACTUAL value — the whole)",ans:"The actual length = <strong>15 cm = 100%</strong>"},{label:"What do you get when you do Part &divide; Whole? (Then &times; 100)",ans:"1 &divide; 15 &asymp; 0.0667 &nbsp;&rarr;&nbsp; 0.0667 &times; 100 &asymp; <strong>6.7%</strong>"}],
+   mcQ:"Which is closest to the percent error?",mc:["A.  6.7%","B.  7.1%","C.  93.3%","D.  14%"],mcA:0,mcE:"|14−15| ÷ 15 × 100 = 1/15 × 100 ≈ 6.7% ✓"},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v2",
+   problem:`Jessiana measured the weight of a book to be <strong>500 grams</strong>. The actual weight is <strong>480 grams</strong>.`,
+   steps:[{label:"What am I wrong by? Find |measured &minus; actual|",ans:"|500 &minus; 480| = <strong>20</strong> (wrong by 20 g)"},{label:"What is the 100%? (Always the ACTUAL value — the whole)",ans:"The actual weight = <strong>480 g = 100%</strong>"},{label:"What do you get when you do Part &divide; Whole? (Then &times; 100)",ans:"20 &divide; 480 &asymp; 0.0417 &nbsp;&rarr;&nbsp; 0.0417 &times; 100 &asymp; <strong>4.2%</strong>"}],
+   mcQ:"Which is closest to the percent error?",mc:["A.  4.0%","B.  4.2%","C.  95.8%","D.  104.2%"],mcA:1,mcE:"|500−480| ÷ 480 × 100 = 20/480 × 100 ≈ 4.2% ✓"},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v2",
+   problem:`Zilaya measured the height of a plant to be <strong>45 cm</strong>. The actual height is <strong>42 cm</strong>.`,
+   steps:[{label:"Step 1 · Find the absolute error",ans:"|45 &minus; 42| = <strong>3</strong>"},{label:"Step 2 · Divide by the ACTUAL value (42 cm)",ans:"3 &divide; 42 &asymp; <strong>0.0714</strong>"},{label:"Step 3 · Convert to a percent",ans:"0.0714 &times; 100 &asymp; <strong>7.1%</strong>"}],
+   mcQ:"Which is closest?",mc:["A.  6.7%","B.  7.1%","C.  93.3%","D.  106.7%"],mcA:1,mcE:"|45−42| ÷ 42 × 100 = 3/42 × 100 ≈ 7.1% ✓"},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`A student measured the length of a book to be <strong>32 cm</strong>. The actual length is <strong>30 cm</strong>. Which is closest to the percent error?`,
+   mcQ:"Which is closest to the percent error?",
+   mc:["A.\u00a0\u00a06.3%","B.\u00a0\u00a06.7%","C.\u00a0\u00a093.8%","D.\u00a0\u00a0106.3%"],
+   mcA:1,mcE:"|32\u221230| \u00f7 30 \u00d7 100 = 2/30 \u00d7 100 \u2248 6.7% \u2713"},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v2",
+   problem:`Rafael measured the width of a window to be <strong>32 inches</strong>. The actual width is <strong>35 inches</strong>.`,
+   mcQ:"Which is closest to the percent error?",mc:["A.  8.6%","B.  9.4%","C.  91.4%","D.  109.4%"],mcA:0,mcE:"|32−35| ÷ 35 × 100 = 3/35 × 100 ≈ 8.6% ✓"},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v2",
+   problem:`Prabal measured a hallway and recorded <strong>18.5 meters</strong>. The actual length is <strong>17.2 meters</strong>.`,
+   parts:[{q:"a.  Calculate the percent error. Round to the nearest tenth.",ans:"|18.5 &minus; 17.2| &divide; 17.2 &times; 100 = 1.3 &divide; 17.2 &times; 100 &asymp; <strong>7.6%</strong>"},{q:"b.  Yonnie got a 5% error. What are two possible measurements she could have recorded?",ans:"5% of 17.2 = 0.86<br>Could measure: <strong>17.2 + 0.86 = 18.06 m</strong> &nbsp; OR &nbsp; <strong>17.2 &minus; 0.86 = 16.34 m</strong>"}]}
+]},
+{title:"Finding a New Amount After a Percent Increase",emoji:"📈",
+ concept:"New Amount = Original &times; (1 + percent increase).  Or: find the increase amount, then add it to the original.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v3w",
+   problem:`Avery's school garden has <strong>200 plants</strong>. After spring planting, there are <strong>40% more</strong> plants. How many now?`,
+   steps:[{label:"Step 1 · Use the table: 200 = 100%. What is 1% of 200?",ans:"200 &divide; 100 = <strong>2</strong> (each 1% = 2 plants)"},{label:"Step 2 · New total% = 100% + 40% = 140%. Use the table to find 140%.",ans:"140 &times; 2 = <strong>280 plants</strong>"}]},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v3mi",
+   problem:`A parking lot has <strong>80 spaces</strong>. A new lot nearby will have <strong>25% more</strong> spaces.`,
+   hint:"Find 25% of 80, then add the result to 80.",
+   steps:[{label:"Step 1 · Use the table: 80 = 100%. What is 1% of 80?",ans:"80 &divide; 100 = <strong>0.80</strong> (each 1% = 0.80 spaces)"},{label:"Step 2 · New total% = 100% + 25% = 125%. Use the table to find 125%.",ans:"125 &times; 0.80 = <strong>100 spaces</strong>"}],
+   mcQ:"How many spaces does the new lot have?",mc:["A.  20","B.  60","C.  100","D.  120"],mcA:2,mcE:"25% of 80 = 20. 80 + 20 = 100 spaces ✓"},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v3me",
+   problem:`Tessa's fish tank holds <strong>60 gallons</strong>. She's getting a new tank that holds <strong>35% more</strong>.`,
+   steps:[{label:"Step 1 · Use the table: 60 = 100%. What is 1% of 60?",ans:"60 &divide; 100 = <strong>0.60</strong> (each 1% = 0.60 gallons)"},{label:"Step 2 · New total% = 100% + 35% = 135%. Use the table to find 135%.",ans:"135 &times; 0.60 = <strong>81 gallons</strong>"}],
+   mcQ:"How many gallons does her new tank hold?",mc:["A.  21 gallons","B.  39 gallons","C.  60 gallons","D.  81 gallons"],mcA:3,mcE:"35% of 60 = 21. 60 + 21 = 81 gallons ✓"},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v3",
+   problem:`A car is <strong>150 inches</strong> long. A truck is <strong>80% longer</strong> than the car.`,
+   steps:[{label:"Step 1 · Find 80% of 150 inches",ans:"0.80 &times; 150 = <strong>120 inches</strong>"},{label:"Step 2 · Add to the car's length",ans:"150 + 120 = <strong>270 inches</strong>"}],
+   mcQ:"How long is the truck?",mc:["A.  120 inches","B.  180 inches","C.  270 inches","D.  300 inches"],mcA:2,mcE:"80% of 150 = 120. 150 + 120 = 270 inches ✓"},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`A fish pond holds <strong>240 gallons</strong>. After an expansion, it holds <strong>65% more</strong>. How many gallons does it hold now?`,
+   mcQ:"How many gallons does the expanded pond hold?",
+   mc:["A.\u00a0\u00a0156 gallons","B.\u00a0\u00a0240 gallons","C.\u00a0\u00a0396 gallons","D.\u00a0\u00a0400 gallons"],
+   mcA:2,mcE:"65% of 240 = 156. 240 + 156 = 396 gallons \u2713"},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v3",
+   problem:`A car is <strong>165 inches</strong> long. A bus is <strong>60% longer</strong> than the car.`,
+   mcQ:"How long is the bus?",mc:["A.  60 inches","B.  99 inches","C.  264 inches","D.  330 inches"],mcA:2,mcE:"60% of 165 = 99. 165 + 99 = 264 inches ✓"},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v3",
+   problem:`Diana runs <strong>12.4 miles</strong>. Next month: <strong>35% longer</strong>. Month after: <strong>20% longer</strong> than that.`,
+   parts:[{q:"a.  How long is next month's route? Round to the nearest hundredth.",ans:"12.4 &times; 1.35 = <strong>16.74 miles</strong>"},{q:"b.  How long is the route the month after? Round to the nearest hundredth.",ans:"16.74 &times; 1.20 &asymp; <strong>20.09 miles</strong>"},{q:"c.  By what percent did Diana's route increase overall? Round to the nearest whole percent.",ans:"(20.09 &minus; 12.4) &divide; 12.4 &times; 100 &asymp; <strong>62%</strong> total increase"}]}
+]},
+{title:"Discount Problems",emoji:"🏷️",
+ concept:"With a p% discount, you pay (100 &minus; p)% of the original price.  To find the original from a sale price: divide by the decimal you pay.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v5",
+   problem:`Today, everything at a store is <strong>30% off</strong> the regular price. Solve parts a, b, and c below.`,
+   steps:[{label:"Part a · Regular price = $60. Find the discounted price.",ans:"Discount: 0.30 &times; $60 = $18 &rarr; $60 &minus; $18 = <strong>$42</strong> (or: 0.70 &times; $60 = $42)"},{label:"Part b · If regular price is d dollars, write expression for discounted price.",ans:"You pay 70% &rarr; expression: <strong>0.70d</strong>"},{label:"Part c · Discounted price = $42. Find the regular price.",ans:"$42 &divide; 0.70 = <strong>$60</strong>"}]},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v5",
+   problem:`A store is offering a <strong>10% discount</strong> on everything today. Solve parts a, b, and c below.`,
+   hint:"With 10% off, you pay 90% of the original price (100% − 10% = 90%).",
+   steps:[{label:"a.  Regular price of t-shirt = $30. Find discounted price.",ans:"0.90 &times; $30 = <strong>$27</strong>"},{label:"b.  If regular price is p dollars, write expression for discounted price.",ans:"<strong>0.90p</strong>"},{label:"c.  Discounted price of book = $18. Find regular price.",ans:"$18 &divide; 0.90 = <strong>$20</strong>"}]},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v5",
+   problem:`A store is offering a <strong>25% discount</strong> on all items. Solve parts a, b, and c below.`,
+   steps:[{label:"a.  Regular price of shoes = $48. Find discounted price.",ans:"0.75 &times; $48 = <strong>$36</strong>"},{label:"b.  If regular price is n dollars, write expression.",ans:"<strong>0.75n</strong>"},{label:"c.  Discounted price of bag = $36. Find regular price.",ans:"$36 &divide; 0.75 = <strong>$48</strong>"}]},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v5",
+   problem:`A store is offering a <strong>35% discount</strong> on everything.<br><br>
+<strong>a.</strong> A video game regularly costs <strong>$80</strong>. What is the discounted price?<br>
+<strong>b.</strong> If the regular price is <em>v</em> dollars, write an expression for the discounted price.<br>
+<strong>c.</strong> The discounted price of headphones is <strong>$52</strong>. What is the regular price?`,
+   steps:[{label:"Part a · Video game = $80. What % do you pay? Find discounted price.",ans:"100% &minus; 35% = 65% &rarr; 0.65 &times; $80 = <strong>$52</strong>"},{label:"Part b · If regular price is v dollars, write expression.",ans:"<strong>0.65v</strong>"},{label:"Part c · Discounted price of headphones = $52. Find regular price.",ans:"$52 &divide; 0.65 = <strong>$80</strong>"}]},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`A store is offering a <strong>40% discount</strong> on all items.`,
+   parts:[
+     {q:"a.\u00a0 Sneakers regularly cost <strong>$90</strong>. What is the discounted price?",ans:"0.60 \u00d7 $90 = <strong>$54</strong>"},
+     {q:"b.\u00a0 If the regular price is <em>k</em> dollars, write an expression for the discounted price.",ans:"<strong>0.60k</strong>"},
+     {q:"c.\u00a0 The discounted price of a belt is <strong>$36</strong>. What is the regular price?",ans:"$36 \u00f7 0.60 = <strong>$60</strong>"}
+   ]},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v5",
+   problem:`A store is offering a <strong>45% discount</strong> on all electronics.<br><br>
+<strong>a.</strong> A tablet regularly costs <strong>$120</strong>. What is the discounted price?<br>
+<strong>b.</strong> If the regular price is <em>t</em> dollars, write an expression for the discounted price.<br>
+<strong>c.</strong> The discounted price of a laptop is <strong>$330</strong>. What is the regular price?`,
+   steps:[{label:"a.  Tablet regularly costs $120. Find discounted price.",ans:"0.55 &times; $120 = <strong>$66</strong>"},{label:"b.  If regular price is t dollars, write expression.",ans:"<strong>0.55t</strong>"},{label:"c.  Discounted price of laptop = $330. Find regular price.",ans:"$330 &divide; 0.55 = <strong>$600</strong>"}]},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v5",
+   problem:`Muna works at a store: <strong>30% off Mondays</strong>, <strong>40% off Fridays</strong>.`,
+   parts:[{q:"a.  Jacket regularly costs $90. How much more do you save buying it on Friday vs Monday?",ans:"Monday: save $27 (pay $63) | Friday: save $36 (pay $54)<br>Save <strong>$9 more</strong> on Friday"},{q:"b.  Monday coat at $63, Friday scarf at $15. Find the regular price of each.",ans:"Coat: $63 &divide; 0.70 = <strong>$90</strong> &nbsp;|&nbsp; Scarf: $15 &divide; 0.60 = <strong>$25</strong>"},{q:"c.  Maya has $100. Can she afford both at regular prices? At sale prices?",ans:"Regular: $90+$25=$115 → <strong>No</strong>, $15 over<br>Monday sale: $63+$17.50=$80.50 → <strong>Yes!</strong>"}]}
+]},
+{title:"Multi-Step Percent Problems: Discount Then Tax",emoji:"🧾",
+ concept:"Apply the discount <em>FIRST</em> to get the sale price. Then apply the tax to the sale price — not the original price.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v6w",
+   problem:`Pamilerin pays for a <strong>$40 meal</strong>. He has a <strong>25%-off coupon</strong>. After the discount, an <strong>8% sales tax</strong> is applied. How much does Pamilerin pay?`,
+   steps:[{label:"OLD 100%: $40 = 100%. What % are you paying? (100% &minus; 25%) Find that $ amount using the table.",ans:"Paying 75% &rarr; 100|40, &divide;100 &rarr; 1|0.40, &times;75 &rarr; <strong>75% = $30 (sale price)</strong>"},{label:"NEW 100%: $30 = New 100%. Add the 8% tax. Find 108% using the table.",ans:"100%+8% = 108% &rarr; 100|30, &divide;100 &rarr; 1|0.30, &times;108 &rarr; <strong>108% = $32.40 (final price!)</strong>"}]},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v6mi",
+   problem:`Ubad pays for a <strong>$20 meal</strong>. She has a <strong>10%-off coupon</strong>. After the discount, a <strong>5% sales tax</strong> is applied. How much does Ubad pay?`,
+   hint:"Apply the discount first, then apply tax to the lower (sale) price — not the original!",
+   steps:[{label:"OLD 100%: $20 = 100%. What % are you paying? (100% &minus; 10%) Find that $ amount using the table.",ans:"Paying 90% &rarr; 100|20, &divide;100 &rarr; 1|0.20, &times;90 &rarr; <strong>90% = $18 (sale price)</strong>"},{label:"NEW 100%: $18 = New 100%. Add the 5% tax. Find 105% using the table.",ans:"100%+5% = 105% &rarr; 100|18, &divide;100 &rarr; 1|0.18, &times;105 &rarr; <strong>105% = $18.90 (final price!)</strong>"}]},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v6me",
+   problem:`Shiah buys lunch for <strong>$16</strong>. He has a <strong>20%-off coupon</strong>. After the discount, a <strong>6% sales tax</strong> is applied. How much does Shiah pay?`,
+   steps:[{label:"OLD 100%: $16 = 100%. What % are you paying? (100% &minus; 20%) Find that $ amount using the table.",ans:"Paying 80% &rarr; 100|16, &divide;100 &rarr; 1|0.16, &times;80 &rarr; <strong>80% = $12.80 (sale price)</strong>"},{label:"NEW 100%: $12.80 = New 100%. Add the 6% tax. Find 106% using the table.",ans:"100%+6% = 106% &rarr; 100|12.80, &divide;100 &rarr; 1|0.128, &times;106 &rarr; <strong>106% = $13.57 (final price!)</strong>"}]},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v6",
+   problem:`Nika pays for a <strong>$24 dinner</strong>. She has a <strong>15%-off coupon</strong>. After the discount, an <strong>8% sales tax</strong> is applied. <strong>How much does Nika pay? Show all your work.</strong>`,
+   steps:[{label:"Step 1 · 15% off $24",ans:"0.15 &times; $24 = $3.60 &rarr; $24 &minus; $3.60 = <strong>$20.40</strong>"},{label:"Step 2 · Apply 8% tax to $20.40",ans:"0.08 &times; $20.40 &asymp; <strong>$1.63</strong>"},{label:"Total",ans:"$20.40 + $1.63 = <strong>$22.03</strong>"}]},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`Carlos is buying a <strong>$45 meal</strong>. He has a <strong>20%-off coupon</strong>. After the discount, a <strong>9% sales tax</strong> is applied.`,
+   parts:[
+     {q:"What does Carlos pay? Show your full work.",ans:"Discounted: 0.80 \u00d7 $45 = <strong>$36</strong><br>Tax: 0.09 \u00d7 $36 = $3.24<br>Total: $36 + $3.24 = <strong>$39.24</strong>"}
+   ]},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v6",
+   problem:`Jasson buys a <strong>$35 meal</strong>. He has a <strong>20%-off coupon</strong>. After the discount, a <strong>9% sales tax</strong> is applied. <strong>How much does Jasson pay? Show all your work.</strong>`,
+   steps:[{label:"Step 1 · Find the discounted price",ans:"0.80 &times; $35 = <strong>$28</strong>"},{label:"Step 2 · Apply 9% tax",ans:"0.09 &times; $28 = <strong>$2.52</strong>"},{label:"Total",ans:"$28 + $2.52 = <strong>$30.52</strong>"}]},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v6",
+   problem:`Lyra and Taraji go out for dinner.<br><strong>Lyra's meal:</strong> <strong>$22</strong>, <strong>30% off coupon</strong>, then <strong>7% sales tax</strong>.<br><strong>Taraji's meal:</strong> <strong>$28</strong>, no coupon, then <strong>7% sales tax</strong>.`,
+   parts:[{q:"a.  How much does each person pay? Show work for both.",ans:"<strong>Lyra:</strong> 0.70&times;$22=$15.40 &rarr; 1.07&times;$15.40=<strong>$16.48</strong><br><strong>Taraji:</strong> 1.07&times;$28=<strong>$29.96</strong>"},{q:"b.  They split the total bill evenly. How much does each person owe?",ans:"$16.48+$29.96=$46.44 &rarr; &divide;2 = <strong>$23.22 each</strong>"},{q:"c.  They want to leave a 20% tip on the combined pre-tax, pre-discount total. How much is the tip?",ans:"Pre-discount total = $22+$28=$50<br>20% tip = 0.20&times;$50 = <strong>$10</strong>"}]}
+]},
+{title:"Commission, Markup, and Percent Raise",emoji:"💼",
+ concept:"Commission = rate &times; total sales. &nbsp; Markup % = (sell &minus; cost) &divide; cost &times; 100%. &nbsp; New wage = original &times; (1 + raise %).",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v7",
+   problem:`Yonnie works at an electronics store. Solve parts a, b, and c below.`,
+   steps:[{label:"Part a — Commission: Yonnie earns 4% of what he sells. He sold $500 in electronics. How much was his commission?",ans:"0.04 &times; $500 = <strong>$20</strong>"},{label:"Part b — Markup: The store buys headphones for $40 and sells them for $60. Use the % | $ table below — what is the markup percentage?",ans:"$40=100% &rarr; &divide;40 &rarr; $1=2.5% &rarr; &times;60 &rarr; $60=150% &nbsp;&rarr;&nbsp; 150%&minus;100% = <strong>50% markup</strong>",midVis:"v7w_b"},{label:"Part c — Percent Raise: Avery earns $14 per hour. The store offers them a 6% raise. What will their new hourly wage be?",ans:"$14 &times; 1.06 = <strong>$14.84/hr</strong>"}]},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v7",
+   problem:`Imani works at a bookstore. Solve parts a, b, and c below.`,
+   hint:"Markup % = (selling − cost) ÷ cost × 100%.   New wage = original × (1 + raise %).",
+   steps:[{label:"a. Imani earns a 3% commission. She sold $200 worth of goods. How much was her commission?",ans:"0.03 &times; $200 = <strong>$6</strong>"},{label:"b. The store buys a book for $10 and sells it for $15. Use the % | $ table below — what is the markup percentage?",ans:"$10=100% &rarr; &divide;10 &rarr; $1=10% &rarr; &times;15 &rarr; $15=150% &nbsp;&rarr;&nbsp; 150%&minus;100% = <strong>50% markup</strong>",midVis:"v7mi_b"},{label:"c. Matthew earns $10 per hour. The store offers him a 4% raise. What will his new hourly wage be?",ans:"$10 &times; 1.04 = <strong>$10.40/hr</strong>"}]},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v7",
+   problem:`Roman works at a shoe store. Solve parts a, b, and c below.`,
+   steps:[{label:"a. Roman earns a 5% commission. He sold $600 worth of shoes. How much was his commission?",ans:"0.05 &times; $600 = <strong>$30</strong>"},{label:"b. The store buys sneakers for $40 and sells them for $56. Use the % | $ table below — what is the markup percentage?",ans:"$40=100% &rarr; &divide;40 &rarr; $1=2.5% &rarr; &times;56 &rarr; $56=140% &nbsp;&rarr;&nbsp; 140%&minus;100% = <strong>40% markup</strong>",midVis:"v7me_b"},{label:"c. Cora earns $13 per hour. The store offers her a 3% raise. What will her new hourly wage be?",ans:"$13 &times; 1.03 = <strong>$13.39/hr</strong>"}]},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v7",
+   problem:`Sammy and Aleena both work at a shoe store.<br><br>
+<strong>a.</strong> Sammy earns a <strong>2.5% commission</strong>. Last week, he sold <strong>$800</strong> worth of shoes. How much was his commission?<br>
+<strong>b.</strong> The store buys boots for <strong>$60</strong> and sells them for <strong>$90</strong>. What is the markup percentage?<br>
+<strong>c.</strong> Aleena earns <strong>$15 per hour</strong>. The store offers her a <strong>5% raise</strong>. What will her new hourly wage be?`,
+   steps:[{label:"Part a — Commission · Sammy earns 2.5% on $800 in sales.",ans:"2.5% &rarr; 0.025 &rarr; 0.025 &times; $800 = <strong>$20</strong>"},{label:"Part b — Markup · Boots cost $60, sell for $90.",ans:"($90&minus;$60)&divide;$60&times;100% = $30&divide;$60&times;100% = <strong>50%</strong>"},{label:"Part c — Raise · Aleena earns $15/hr, gets a 5% raise.",ans:"$15 &times; 1.05 = <strong>$15.75/hr</strong>"}]},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`Destiny works at a clothing store.`,
+   parts:[
+     {q:"a.\u00a0 Destiny earns <strong>3% commission</strong>. She sold <strong>$750</strong> worth of clothes. How much was her commission?",ans:"0.03 \u00d7 $750 = <strong>$22.50</strong>"},
+     {q:"b.\u00a0 The store buys sunglasses for <strong>$25</strong> and sells them for <strong>$40</strong>. What is the markup percentage?",ans:"($40 \u2212 $25) \u00f7 $25 \u00d7 100% = $15 \u00f7 $25 \u00d7 100% = <strong>60%</strong>"},
+     {q:"c.\u00a0 Jaylen earns <strong>$11 per hour</strong>. The store offers him a <strong>6% raise</strong>. What will his new hourly wage be?",ans:"$11 \u00d7 1.06 = <strong>$11.66/hr</strong>"}
+   ]},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v7",
+   problem:`Maya works at a clothing store.<br><br>
+<strong>a.</strong> Maya earns a <strong>3.5% commission</strong>. Last week, she sold <strong>$1,200</strong> worth of clothing. How much was her commission?<br>
+<strong>b.</strong> The store buys a jacket for <strong>$45</strong> and sells it for <strong>$72</strong>. What is the markup percentage?<br>
+<strong>c.</strong> Theo earns <strong>$16.50 per hour</strong>. The store offers him a <strong>4% raise</strong>. What will his new hourly wage be?`,
+   steps:[{label:"a.  Maya earns 3.5% of $1,200 in sales. Commission?",ans:"0.035 &times; $1,200 = <strong>$42</strong>"},{label:"b.  Jacket costs $45, sells for $72. Markup %?",ans:"($72&minus;$45)&divide;$45&times;100% = $27&divide;$45&times;100% = <strong>60%</strong>"},{label:"c.  Theo earns $16.50/hr, gets a 4% raise. New wage?",ans:"$16.50 &times; 1.04 = <strong>$17.16/hr</strong>"}]},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v7",
+   problem:`Prabal, Juliah, and Muna all work at a clothing store.`,
+   parts:[{q:"a.  Prabal earns <strong>4% commission</strong> on <strong>$850</strong>. Juliah earns <strong>8% commission</strong> on <strong>$400</strong>. Who earned more, and by how much?",ans:"Prabal: 0.04&times;$850=<strong>$34</strong> | Juliah: 0.08&times;$400=<strong>$32</strong><br><strong>Prabal earned $2 more</strong>"},{q:"b.  Store bought a dress for <strong>$35</strong>, wants to sell at a <strong>120% markup</strong>. What's the selling price?",ans:"Markup: 1.20&times;$35=$42 &rarr; $35+$42 = <strong>$77</strong>"},{q:"c.  Muna earns <strong>$18/hr</strong>. Gets a <strong>3.5% raise</strong>, then later a <strong>2% raise</strong> on her new wage. Final wage?",ans:"$18&times;1.035=$18.63 &rarr; $18.63&times;1.02 &asymp; <strong>$19.00/hr</strong>"}]}
+]},
+{title:"Writing Equations for Proportional Relationships",emoji:"📐",
+ concept:"Find the unit rate (always divide!). Then write an equation connecting your two variables.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v1",
+   problem:`Mahteb has a recipe for smoothies. She uses <strong>6 cups</strong> of frozen fruit to make <strong>4 smoothies</strong>. Imani will follow the same recipe, making <em>s</em> smoothies using <em>f</em> cups of frozen fruit.`,
+   steps:[{label:"Step 1 · Find the unit rate (cups per smoothie)",ans:"6 &divide; 4 = <strong>3/2 = 1&frac12; cups per smoothie</strong>"},{label:"Step 2 · Write an equation for f (cups)",ans:"f = (3/2) &times; s"},{label:"Step 3 · Solve for s (smoothies)",ans:"s = f &divide; (3/2) = <strong>(2/3) &times; f</strong>"}],
+   mcQ:"Which equation represents the relationship between s and f?",mc:["A.  s = (3/2)f","B.  s = (2/3)f","C.  f = (2/3)s","D.  s = 6f"],mcA:1,mcE:"f = (3/2)s → divide both sides by 3/2 → s = (2/3)f ✓"},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v1",
+   problem:`Mason uses <strong>8 cups</strong> of lemonade mix to make <strong>4 pitchers</strong>. He will make <em>p</em> pitchers using <em>m</em> cups of mix.`,
+   hint:"Find the unit rate (cups per pitcher) first, then write an equation for m and solve for p.",
+   steps:[{label:"Step 1 · Find the unit rate (cups per pitcher)",ans:"8 &divide; 4 = <strong>2 cups per pitcher</strong>"},{label:"Step 2 · Write an equation for m (cups of mix)",ans:"m = 2 &times; p"},{label:"Step 3 · Solve for p (pitchers)",ans:"p = m &divide; 2 = <strong>(1/2) &times; m</strong>"}],
+   mcQ:"Which equation shows the relationship between p and m?",mc:["A.  p = 2m","B.  p = (1/2)m","C.  m = (1/2)p","D.  p = 8m"],mcA:1,mcE:"Unit rate = 2 cups/pitcher → m = 2p → p = (1/2)m ✓"},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v1",
+   problem:`Theo uses <strong>9 cups</strong> of oats to make <strong>6 bags</strong> of granola. He will make <em>b</em> bags using <em>c</em> cups of oats.`,
+   steps:[{label:"Step 1 · Find the unit rate (cups per bag)",ans:"9 &divide; 6 = <strong>3/2 = 1.5 cups per bag</strong>"},{label:"Step 2 · Write an equation for c (cups of oats)",ans:"c = (3/2) &times; b"},{label:"Step 3 · Solve for b (bags)",ans:"b = c &divide; (3/2) = <strong>(2/3) &times; c</strong>"}],
+   mcQ:"Which equation shows the relationship between b and c?",mc:["A.  b = (2/3)c","B.  b = (3/2)c","C.  c = (2/3)b","D.  b = (6/9)c"],mcA:0,mcE:"Unit rate = 3/2 cups/bag → c = (3/2)b → b = (2/3)c ✓"},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v1",
+   problem:`Roman uses <strong>5&frac14; cups</strong> of flour to make <strong>3 batches</strong> of cookies. He will make <em>b</em> batches using <em>f</em> cups of flour.`,
+   hint:"Convert 5¼ to an improper fraction first: 5¼ = 21/4",
+   steps:[{label:"Step 1 · Convert 5¼ to an improper fraction",ans:"5&frac14; = <strong>21/4</strong>"},{label:"Step 2 · Find the unit rate (&divide; 3)",ans:"(21/4) &divide; 3 = 21/12 = <strong>7/4 cups per batch</strong>"},{label:"Step 3 · Write equations for f and b",ans:"f = (7/4) &times; b &nbsp;&rarr;&nbsp; b = (4/7) &times; f"}],
+   mcQ:"Which equation represents the relationship between b and f?",mc:["A.  b = (4/7)f","B.  b = (12/21)f","C.  b = (7/4)f","D.  b = (4/21)f"],mcA:0,mcE:"Unit rate = 7/4 cups/batch → f = (7/4)b → b = (4/7)f ✓"},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`Keion uses <strong>4\u00bd cups</strong> of rice to make <strong>3 servings</strong> of paella. He will make <em>s</em> servings using <em>r</em> cups of rice.`,
+   mcQ:"Which equation represents the relationship between s and r?",
+   mc:["A.\u00a0\u00a0s = (3/2)r","B.\u00a0\u00a0s = (2/3)r","C.\u00a0\u00a0r = (2/3)s","D.\u00a0\u00a0s = 9r"],
+   mcA:1,mcE:"4\u00bd = 9/2. Unit rate = (9/2)\u00f73 = 3/2 cups/serving. So r = (3/2)s \u2192 s = (2/3)r \u2713"},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v1",
+   problem:`Aleena uses <strong>8&frac13; cups</strong> of paint to cover <strong>5 walls</strong>. She will paint <em>w</em> walls using <em>p</em> cups of paint.`,
+   mcQ:"Which equation represents the relationship between w and p?",mc:["A.  w = (3/25)p","B.  w = (25/15)p","C.  w = (3/5)p","D.  w = (25/3)p"],mcA:2,mcE:"8⅓ = 25/3. Unit rate = (25/3)÷5 = 5/3 cups/wall → p = (5/3)w → w = (3/5)p ✓"},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v1",
+   problem:`Cayden uses <strong>6&frac25; cups</strong> of cement mix to lay <strong>4 square feet</strong> of tile. He will cover <em>a</em> sq ft using <em>c</em> cups of cement mix.`,
+   parts:[{q:"a.  Write an equation giving <em>a</em> in terms of <em>c</em>.",ans:"6⅖ = 32/5. Unit rate = (32/5)÷4 = <strong>8/5 cups per sq ft</strong><br>So c = (8/5)a &nbsp;&rarr;&nbsp; <strong>a = (5/8)c</strong>"},{q:"b.  Write an equation giving <em>c</em> in terms of <em>a</em>.",ans:"<strong>c = (8/5)a</strong>"},{q:"c.  If Cayden has <strong>16 cups</strong> of cement mix, how many sq ft can he tile?",ans:"a = (5/8) &times; 16 = <strong>10 square feet</strong>"}]}
+]},
+{title:"Unit Rate with Fractions",emoji:"⚡",
+ concept:"Speed (or rate) = distance &divide; time.  To divide fractions, multiply by the reciprocal.  Always include units.",
+ levels:[
+  {tier:"worked",note:"Fill in the blanks — learn as you go!",vis:"v4",
+   problem:`A turtle travels <strong>5/6 of a mile</strong> every <strong>2/3 of an hour</strong>. What is the speed in miles per hour?`,
+   steps:[{label:"Step 1 · Set up the division: distance &divide; time",ans:"Speed = (5/6) &divide; (2/3)"},{label:"Step 2 · Flip the 2nd fraction (reciprocal of 2/3 is 3/2)",ans:"(5/6) &times; (3/2)"},{label:"Step 3 · Multiply numerators &amp; denominators, then simplify",ans:"(5&times;3)/(6&times;2) = 15/12 = <strong>5/4 = 1&frac14; miles per hour</strong>"}]},
+  {tier:"mild",note:"Most support — you've got this!",vis:"v4",
+   problem:`A snail moves <strong>3/4 of an inch</strong> every <strong>1/2 minute</strong>. What is the speed in inches per minute?`,
+   hint:"Speed = distance ÷ time. To divide by 1/2, multiply by its reciprocal (2/1 = 2).",
+   steps:[{label:"Step 1 · Set up the division: (3/4) &divide; (1/2)",ans:"Speed = (3/4) &divide; (1/2)"},{label:"Step 2 · Flip the 2nd fraction (reciprocal of 1/2 is 2/1)",ans:"(3/4) &times; (2/1)"},{label:"Step 3 · Multiply and simplify",ans:"(3&times;2)/(4&times;1) = 6/4 = <strong>3/2 = 1&frac12; inches per minute</strong>"}]},
+  {tier:"medium",note:"Less support — trust yourself!",vis:"v4",
+   problem:`A leaky faucet drips <strong>2/3 of a cup</strong> every <strong>3/4 of a minute</strong>. What is the rate in cups per minute?`,
+   steps:[{label:"Step 1 · Set up the division: (2/3) &divide; (3/4)",ans:"Speed = (2/3) &divide; (3/4)"},{label:"Step 2 · Flip the 2nd fraction (reciprocal of 3/4 is 4/3)",ans:"(2/3) &times; (4/3)"},{label:"Step 3 · Multiply and simplify",ans:"(2&times;4)/(3&times;3) = 8/9 &rarr; <strong>8/9 cups per minute</strong>"}]},
+  {tier:"spicy",note:"Test level · with scaffolding",vis:"v4",
+   problem:`A train travels <strong>5/6 kilometers</strong> every <strong>2/5 minutes</strong>. What is the speed?`,
+   steps:[{label:"Step 1 · Set up the division: distance &divide; time",ans:"Speed = (5/6) &divide; (2/5)"},{label:"Step 2 · Flip the 2nd fraction (reciprocal of 2/5 is 5/2)",ans:"(5/6) &times; (5/2)"},{label:"Step 3 · Multiply and simplify",ans:"25/12 = <strong>2 1/12 kilometers per minute</strong>"}]},
+  {tier:"spicy2",note:"No formula \u00b7 no scaffolding",
+   problem:`A dragonfly travels <strong>4/5 of a meter</strong> every <strong>2/3 of a second</strong>. What is the speed in meters per second?`,
+   parts:[
+     {q:"What is the speed of the dragonfly in meters per second? Show all your work.",ans:"(4/5) \u00f7 (2/3) = (4/5) \u00d7 (3/2) = 12/10 = <strong>6/5 = 1.2 meters per second</strong>"}
+   ]},
+  {tier:"extra",note:"Test level · no scaffolding",vis:"v4",
+   problem:`A cyclist rides <strong>7/8 of a mile</strong> every <strong>3/5 of a minute</strong>. Find the speed in miles per minute.`,
+   steps:[{label:"Full solution — set up, flip, multiply, simplify",ans:"(7/8) &divide; (3/5) = (7/8) &times; (5/3) = 35/24 &rarr; <strong>35/24 miles per minute</strong>"}]},
+  {tier:"super",note:"Challenge! Fully independent",vis:"v4",
+   problem:`Elenatan runs <strong>5/6 of a lap</strong> in <strong>3/4 of a minute</strong>. One lap = <strong>1/4 mile</strong>.`,
+   parts:[{q:"a.  What is Elenatan's speed in laps per minute?",ans:"(5/6) &divide; (3/4) = (5/6) &times; (4/3) = 20/18 = <strong>10/9 laps per minute</strong>"},{q:"b.  What is her speed in miles per minute?",ans:"(10/9) &times; (1/4) = 10/36 = <strong>5/18 miles per minute</strong>"},{q:"c.  At this speed, how many minutes to run 2 miles?",ans:"2 &divide; (5/18) = 2 &times; (18/5) = 36/5 = <strong>7&frac15; minutes</strong>"}]}
+]}
+];
+
+// ─── TEACHER STRATEGIES (extracted from DeeSh's solution methods) ──────────
+const STRATEGIES={
+0:"Percent Error method: Remember — the ACTUAL value is always the whole (= 100%). Find the error: |measured − actual|. That is the part. Divide: part ÷ whole, then × 100%. Example: measured 28 cm, actual 25 cm → whole = 25. Error = |28−25| = 3. So 3÷25 = 0.12 → 12% error.",
+1:"Percent Increase (ratio table method): Original = 100%. Find 1%: divide original by 100. New% = 100% + increase%. Multiply the 1% value by new%. Example: 200 plants, 40% more → 1% = 2 plants → new% = 140% → 140 x 2 = 280. Or multiply: 1.40 x 200 = 280.",
+2:"Discount method: Figure out what % you are PAYING: 100% − discount% = pay%. Multiply price by pay% as a decimal. Example: 20% off means paying 80% → 0.80 × $18 = $14.40. To find the ORIGINAL price from a sale price: divide by the pay% decimal → $18 ÷ 0.80 = $22.50.",
+3:"Discount then Tax method (2 steps): Step 1 — Apply discount first to get sale price: original × (1 − discount%). Step 2 — Apply tax to the SALE price (not original): sale price × (1 + tax%). Example: $20 meal, 15% off, 7% tax → 0.85×$20=$17 → 1.07×$17=$18.19.",
+4:"Commission/Markup/Raise methods: Commission = decimal × sales. Example: 2.5% of $900 → 0.025×900=$22.50. Markup% = (sell−cost)÷cost×100%. Example: buy $50 sell $80 → $30÷$50=0.60=60% markup. Percent raise: new wage = old wage × (1+raise%). Example: $12 × 1.05 = $12.60.",
+5:"Ratio Table method: Draw two columns for your two variables. Put the given values in row 1. Divide BOTH columns to find the unit rate (make one column equal to 1). Write the equation using the unit rate. Example: 9 cups for 6 bags → unit rate = 9÷6 = 1.5 cups per bag → c = 1.5b → so b = (2/3)c.",
+6:"Unit Rate with Fractions: Set up a ratio table (value | time). Convert fractions to decimals. Divide BOTH columns by the time value to get per-1 rate. Example: 3/4 km per 3/2 sec → table: 0.75|1.5 → divide both by 1.5 → 0.5|1 → speed = 0.5 km/sec."
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let doneCount=0, totalCount=0;
+const stepAttempts={}, stepDone=new Set(), partsDone=new Set(), mcDone=new Set();
+const STEP_META={}, MC_META={}, PART_META={};
+
+function stripHtml(s){
+  return s.replace(/<[^>]+>/g,'')
+    .replace(/&[a-z0-9#]+;/g,c=>({'&amp;':'&','&lt;':'<','&gt;':'>','&times;':'×','&divide;':'÷','&minus;':'-','&asymp;':'≈','&rarr;':'→','&frac12;':'½','&frac14;':'¼','&frac13;':'⅓','&frac25;':'⅖','&nbsp;':' '}[c]||c));
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+
+function updateProgress(){
+  const fill=document.getElementById('prog-fill');
+  const num=document.getElementById('prog-count');
+  const pct=totalCount>0?(doneCount/totalCount*100):0;
+  fill.style.width=pct+'%';
+  num.textContent=doneCount;
+  document.getElementById('prog-sub').textContent=`/ ${totalCount} completed`;
+}
+function markCardDone(id){document.getElementById(`${id}_done`)?.classList.add('show')}
+
+// ─── CLAUDE API ──────────────────────────────────────────────────────────
+async function callClaudeStep(topic, stepLabel, correctAns, studentAns, strategy){
+  const clean=stripHtml(correctAns);
+  const stratLine=strategy?`
+
+TEACHER'S METHOD — use this exact approach when giving a guided example:
+${strategy}`:'';
+  const prompt=`You are a warm, encouraging 6th grade math tutor.
+
+Topic: ${topic}
+Step: ${stripHtml(stepLabel)}
+Correct answer: ${clean}
+Student wrote: "${studentAns}"${stratLine}
+
+GRADING RULES — be very flexible and generous:
+- Accept ALL equivalent mathematical forms: 1.5 = 3/2 = 1½ = 6/4; $14.40 = $14.4 = 14.40 ✓
+- Accept missing or different units if the number is correct ✓
+- Accept close approximations: 6.7% ≈ 6.67% ✓; $18.19 ≈ $18.20 ✓
+- Accept differently expressed fractions: 4/7 = 0.571 ✓
+- Accept correct setup/process even with minor arithmetic errors
+- ONLY mark wrong if the core value or approach is fundamentally incorrect
+
+Return ONLY valid JSON (no markdown, no code blocks, no extra text):
+If correct: {"correct":true,"message":"One enthusiastic sentence confirming they got it right","guide":null}
+If wrong: {"correct":false,"message":"One friendly sentence explaining specifically what went wrong","guide":"MANDATORY — never null or empty when wrong. Use the teacher method above. Show a DIFFERENT example in 3-4 numbered steps (Step 1 / Step 2 / Step 3). Max 70 words. Students NEED this to understand their mistake."}`;
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
+  });
+  if(!resp.ok) throw new Error('api');
+  const data=await resp.json();
+  const txt=data.content[0].text.replace(/```json\n?|```/g,'').trim();
+  return JSON.parse(txt);
+}
+
+async function callClaudeMC(topic, question, problemText, wrongChoice, correctChoice, wrongIdx, allChoices, strategy){
+  const stratLine=strategy?`\nTEACHER'S METHOD — use this when giving the worked example:\n${strategy}`:'';
+  const problemLine=problemText?`\nProblem: ${stripHtml(problemText)}`:'';
+  const choiceList=allChoices.length?`\nAll choices: ${allChoices.join(' | ')}`:'';
+  const prompt=`You are a mathematically precise 6th grade math tutor.
+
+Topic: ${topic}
+Question: ${stripHtml(question)}${problemLine}${choiceList}
+The student chose the WRONG answer: "${wrongChoice}"
+The CORRECT answer is: "${correctChoice}"
+${stratLine}
+
+CRITICAL ACCURACY REQUIREMENT:
+Using the actual numbers from the problem above, figure out what specific calculation produces "${wrongChoice}".
+Work it out — do not guess. For example:
+- If correct=8.6% and wrong=91.4% for a percent error problem with measured=32 and actual=35:
+  Calculate: 32÷35×100 = 91.4% → the student used measured/actual instead of error/actual
+  NOT: 35÷32×100 = 109.4% (that would be a different wrong answer)
+
+Only after verifying the math, write:
+1. A 1-2 sentence explanation of the specific calculation that produces "${wrongChoice}" and why it is wrong.
+2. A worked example with DIFFERENT numbers showing the correct method step by step.
+
+Return ONLY valid JSON (no markdown, no extra text):
+{"message":"precise 1-2 sentence explanation of what calculation gives the wrong answer and why","guide":"MANDATORY — never null when wrong. Show the correct method using DIFFERENT simple numbers in 3-4 numbered steps. Max 70 words."}`;
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+  });
+  if(!resp.ok) throw new Error('api');
+  const data=await resp.json();
+  const txt=data.content[0].text.replace(/```json\n?|```/g,'').trim();
+  return JSON.parse(txt);
+}
+
+async function callClaudePart(topic, question, correctAns, studentWork, strategy){
+  const stratLine=strategy?`
+
+TEACHER'S METHOD — use this when giving the worked example:
+${strategy}`:'';
+  const prompt=`You are a supportive 6th grade math tutor.
+
+Topic: ${topic}
+Question: ${stripHtml(question)}
+Correct answer: ${stripHtml(correctAns)}
+Student's work: "${studentWork}"${stratLine}
+
+Grade their work GENEROUSLY — accept equivalent forms, minor arithmetic errors, different notation.
+
+If CORRECT: {"correct":true,"message":"enthusiastic 1-sentence confirmation","guide":null}
+If WRONG: {"correct":false,"message":"1 friendly sentence on what went wrong","guide":"MANDATORY — never null when wrong. Worked example with COMPLETELY DIFFERENT numbers using teacher's method, 3-4 numbered steps, max 70 words."}
+
+Return ONLY valid JSON, no markdown, no extra text.`;
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
+  });
+  if(!resp.ok) throw new Error('api');
+  const data=await resp.json();
+  const txt=data.content[0].text.replace(/```json\n?|```/g,'').trim();
+  return JSON.parse(txt);
+}
+
+// ─── STEP INTERACTIONS ───────────────────────────────────────────────────
+async function checkStep(sid){
+  const input=document.getElementById(`${sid}_in`);
+  const btn=document.getElementById(`${sid}_btn`);
+  const fbWrap=document.getElementById(`${sid}_fb`);
+  const ansEl=document.getElementById(`${sid}_ans`);
+  const meta=STEP_META[sid];
+  if(!input||!meta) return;
+
+  const val=input.value.trim();
+  if(!val){
+    input.classList.add('shake');
+    input.style.borderColor='var(--red)';
+    const ph=input.placeholder;
+    input.placeholder='⚠️ Write your answer first!';
+    setTimeout(()=>{input.classList.remove('shake');input.style.borderColor='';input.placeholder=ph;},2000);
+    return;
+  }
+
+  // Disable + loading
+  input.disabled=true;
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>&nbsp;Checking…';
+  fbWrap.innerHTML='';
+  fbWrap.className='ai-fb-wrap';
+
+  if(!stepAttempts[sid]) stepAttempts[sid]=0;
+  stepAttempts[sid]++;
+  const att=stepAttempts[sid];
+
+  try {
+    const result=await callClaudeStep(meta.topic, meta.label, meta.ans, val, STRATEGIES[meta.si]);
+    if(!result.correct&&!result.guide) result.guide=STRATEGIES[meta.si]||'Look at the steps again and try a different approach.';
+
+    if(result.correct){
+      ansEl.classList.add('show');
+      btn.innerHTML='✓ Correct!';
+      btn.className='check-btn correct';
+      fbWrap.innerHTML=`<div class="ai-correct"><span class="ai-icon">🎉</span><span class="ai-text">${escHtml(result.message)}</span></div>`;
+      fbWrap.className='ai-fb-wrap show';
+      if(!stepDone.has(sid)){stepDone.add(sid);doneCount++;updateProgress();}
+    } else {
+      btn.disabled=false;
+      btn.innerHTML='✔ Check Answer';
+      const guideHtml=result.guide?`<div class="ai-guide"><div class="ai-guide-title">📖 Here's a similar example:</div><div class="ai-guide-body">${escHtml(result.guide)}</div></div>`:'';
+      if(att>=3){
+        // Auto-reveal after 3 wrong attempts
+        ansEl.classList.add('show');
+        input.disabled=true;
+        btn.disabled=true;
+        btn.innerHTML='Answer Revealed';
+        fbWrap.innerHTML=`<div class="ai-wrong"><span class="ai-icon">💭</span><span class="ai-text">${escHtml(result.message)}</span></div>${guideHtml}<div class="retry-row"><span class="attempt-note">Answer revealed after 3 attempts — keep practicing! 💪</span></div>`;
+      } else {
+        input.disabled=false;
+        const left=3-att;
+        fbWrap.innerHTML=`<div class="ai-wrong"><span class="ai-icon">💭</span><span class="ai-text">${escHtml(result.message)}</span></div>${guideHtml}<div class="retry-row"><button class="retry-btn" onclick="retryStep('${sid}')">↩ Try Again (${left} left)</button><button class="show-step-btn" onclick="revealStep('${sid}')">Show Answer</button></div>`;
+      }
+      fbWrap.className='ai-fb-wrap show';
+    }
+  } catch(e){
+    // API unavailable — graceful fallback
+    ansEl.classList.add('show');
+    btn.innerHTML='✔ Check Answer';
+    btn.disabled=false;
+    input.disabled=false;
+    fbWrap.innerHTML=`<div class="ai-neutral"><span class="ai-icon">📖</span><span class="ai-text">Compare your answer above with the correct answer.</span></div>${STRATEGIES[meta.si]?`<div class='ai-guide' style='margin-top:10px'><div class='ai-guide-title'>&#128218; Method reminder:</div><div class='ai-guide-body'>${escHtml(STRATEGIES[meta.si])}</div></div>`:``}<div class="retry-row"><button class="sa-btn sa-got" onclick="markStepDone('${sid}')">✓ Got it!</button><button class="sa-btn sa-more" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.12);color:#fde68a;font-family:Nunito,sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;">🤔 Still working on it</button></div>`;
+    fbWrap.className='ai-fb-wrap show';
+  }
+}
+
+function retryStep(sid){
+  const input=document.getElementById(`${sid}_in`);
+  const btn=document.getElementById(`${sid}_btn`);
+  const fbWrap=document.getElementById(`${sid}_fb`);
+  if(input){input.disabled=false;input.value='';input.focus();}
+  if(btn){btn.disabled=false;btn.innerHTML='✔ Check Answer';btn.className='check-btn';}
+  if(fbWrap){fbWrap.innerHTML='';fbWrap.className='ai-fb-wrap';}
+}
+
+function revealStep(sid){
+  const ansEl=document.getElementById(`${sid}_ans`);
+  const fbWrap=document.getElementById(`${sid}_fb`);
+  if(ansEl) ansEl.classList.add('show');
+  // Remove retry row from feedback
+  const rr=fbWrap?.querySelector('.retry-row');
+  if(rr) rr.remove();
+}
+
+function markStepDone(sid){
+  if(!stepDone.has(sid)){stepDone.add(sid);doneCount++;updateProgress();}
+  const fb=document.getElementById(`${sid}_fb`);
+  const retryRow=fb?.querySelector('.retry-row');
+  if(retryRow) retryRow.innerHTML='<span class="sa-result got">✓ Marked as got it!</span>';
+}
+
+// ─── MC INTERACTIONS ──────────────────────────────────────────────────────
+async function checkMC(btn, cardId){
+  const grid=document.getElementById(`${cardId}_mc`);
+  if(!grid||grid.dataset.done) return;
+  const isCorrect=btn.dataset.correct==='true';
+  const fb=document.getElementById(`${cardId}_fb`);
+  const meta=MC_META[cardId];
+
+  if(isCorrect){
+    btn.classList.add('correct');
+    grid.querySelectorAll('.mc-opt').forEach(b=>b.disabled=true);
+    grid.dataset.done='1';
+    fb.innerHTML='🎉 <strong>Correct!</strong> Great work!';
+    fb.className='mc-feedback ok';
+    markCardDone(cardId);
+    if(!mcDone.has(cardId)){mcDone.add(cardId);doneCount++;updateProgress();}
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled=true;
+    fb.innerHTML='<span class="spinner-sm"></span>Getting a hint…';
+    fb.className='mc-feedback loading';
+    try {
+      const correctBtn=grid.querySelector('[data-correct="true"]');
+      const wrongText=btn.textContent.trim();
+      const wrongIdx=(meta?.choices||[]).indexOf(wrongText);
+      const result=await callClaudeMC(meta?.topic||'Math',meta?.question||'',meta?.problem||'',wrongText,correctBtn?.textContent.trim()||'',wrongIdx,meta?.choices||[],STRATEGIES[meta?.si]);
+      if(!result.guide) result.guide=STRATEGIES[meta?.si]||'Review the method and try again.';
+      const mcGuide=document.getElementById(`${cardId}_mcguide`);
+      fb.innerHTML=`<span class="ai-icon" style="margin-right:6px">💭</span>${escHtml(result.message||result.hint||'Not quite — try another answer!')}`;
+      fb.className='mc-feedback no';
+      if(mcGuide){
+        const mcGuideTxt=result.guide||STRATEGIES[meta?.si]||'Review the method and try again.';
+        mcGuide.innerHTML=`<div class="ai-guide"><div class="ai-guide-title">📖 Here&#39;s a worked example:</div><div class="ai-guide-body">${escHtml(mcGuideTxt)}</div></div>`;
+        mcGuide.style.display='block';
+      }
+    } catch(e){
+      const mcFbGuide=STRATEGIES[meta?.si]?`<div style='margin-top:8px'><strong>Method reminder:</strong><br>${escHtml(STRATEGIES[meta?.si])}</div>`:'';
+      fb.innerHTML='Not quite — try another answer.'+mcFbGuide;
+      fb.className='mc-feedback no';
+    }
+  }
+}
+
+// ─── OPEN PART INTERACTIONS ───────────────────────────────────────────────
+async function checkWork(pid, cardId){
+  const btn=document.getElementById(`${pid}_btn`);
+  const ansEl=document.getElementById(`${pid}_ans`);
+  const workBox=document.getElementById(`${pid}_work`);
+  const aiFb=document.getElementById(`${pid}_aifb`);
+  const meta=PART_META[pid];
+  const studentWork=workBox?.value.trim()||'';
+
+  if(!studentWork){
+    if(workBox){workBox.style.borderColor='var(--red)';workBox.placeholder='⚠️ Write your work first, then click Check!';}
+    setTimeout(()=>{if(workBox){workBox.style.borderColor='';workBox.placeholder='Show your work here…';}},2500);
+    return;
+  }
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>&nbsp;Checking…';
+
+  try {
+    const result=await callClaudePart(meta.topic, meta.question, meta.ans, studentWork, STRATEGIES[meta.si]);
+    if(!result.correct&&!result.guide) result.guide=STRATEGIES[meta.si]||'Review the steps and try a different approach.';
+
+    if(result.correct){
+      ansEl.classList.add('show');
+      btn.innerHTML='✓ Correct!';
+      btn.style.background='linear-gradient(135deg,#15803d,#16a34a)';
+      if(aiFb) aiFb.innerHTML=`<div class="ai-correct" style="margin-bottom:10px"><span class="ai-icon">🎉</span><span class="ai-text">${escHtml(result.message)}</span></div>`;
+      if(!partsDone.has(pid)){partsDone.add(pid);doneCount++;updateProgress();}
+      markCardDone(cardId);
+    } else {
+      const guideHtml=`<div class="ai-guide"><div class="ai-guide-title">📖 Here&#39;s a worked example:</div><div class="ai-guide-body">${escHtml(result.guide||STRATEGIES[meta.si]||'Review the method above and try again.')}</div></div>`;
+      if(aiFb) aiFb.innerHTML=`<div class="ai-wrong" style="margin-bottom:10px"><span class="ai-icon">💭</span><span class="ai-text">${escHtml(result.message)}</span></div>${guideHtml}<div class="retry-row" style="margin-top:10px"><button class="retry-btn" onclick="retryWork('${pid}')">↩ Try Again</button><button class="show-step-btn" onclick="revealPartAns('${pid}','${cardId}')">📖 Show Answer</button></div>`;
+      btn.innerHTML='✔ Check My Work';
+      btn.disabled=false;
+    }
+  } catch(e){
+    ansEl.classList.add('show');
+    btn.innerHTML='✓ Answer shown';
+    btn.style.opacity='.55';
+    if(aiFb) aiFb.innerHTML=`<div class="ai-neutral"><span class="ai-icon">📖</span><span class="ai-text">Compare your work above with the solution.</span></div>${STRATEGIES[meta.si]?`<div class=\'ai-guide\' style=\'margin-top:10px\'><div class=\'ai-guide-title\'>&#128218; Method reminder:</div><div class=\'ai-guide-body\'>${escHtml(STRATEGIES[meta.si])}</div></div>`:``}<div class="retry-row" style="margin-top:8px"><button class="sa-btn sa-got" onclick="markPartDone('${pid}','${cardId}')">✓ I got it!</button></div>`;
+    if(!partsDone.has(pid)){partsDone.add(pid);doneCount++;updateProgress();}
+    markCardDone(cardId);
+  }
+}
+
+function retryWork(pid){
+  const btn=document.getElementById(`${pid}_btn`);
+  const aiFb=document.getElementById(`${pid}_aifb`);
+  const workBox=document.getElementById(`${pid}_work`);
+  if(btn){btn.disabled=false;btn.innerHTML='✔ Check My Work';btn.style.background='';btn.style.opacity='1';}
+  if(aiFb) aiFb.innerHTML='';
+  if(workBox) workBox.focus();
+}
+
+function revealPartAns(pid, cardId){
+  const ansEl=document.getElementById(`${pid}_ans`);
+  const aiFb=document.getElementById(`${pid}_aifb`);
+  if(ansEl) ansEl.classList.add('show');
+  const rr=aiFb?.querySelector('.retry-row');
+  if(rr) rr.remove();
+  if(!partsDone.has(pid)){partsDone.add(pid);doneCount++;updateProgress();}
+  markCardDone(cardId);
+}
+
+function markPartDone(pid, cardId){
+  if(!partsDone.has(pid)){partsDone.add(pid);doneCount++;updateProgress();}
+  markCardDone(cardId);
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────
+const TIER_META={
+  worked:{icon:"⭐",name:"Worked Example"},
+  mild:{icon:"🟢",name:"Mild"},
+  medium:{icon:"🟡",name:"Medium"},
+  spicy:{icon:"🌶️",name:"Spicy"},
+  spicy2:{icon:"🌶️🌶️",name:"Spicy — Part 2"},
+  extra:{icon:"🔥",name:"Extra Spicy"},
+  super:{icon:"💥",name:"Super Spicy"}
+};
+
+function render(){
+  // Count totals — noScaffold tiers convert steps to 1 open-response item
+  const noST=['spicy','extra','spicy2','super'];
+  DATA.forEach(sec=>sec.levels.forEach(lv=>{
+    if(lv.mc) totalCount++;
+    if(lv.parts) totalCount+=lv.parts.length;
+    if(lv.steps&&lv.steps.length){
+      if(!noST.includes(lv.tier)) totalCount+=lv.steps.length;
+      else if(!lv.mc&&!lv.parts) totalCount++;
+    }
+  }));
+  updateProgress();
+
+  const tabsEl=document.getElementById('tabs');
+  const sectionsEl=document.getElementById('sections');
+
+  DATA.forEach((sec,si)=>{
+    const words=sec.title.split(' ');
+    const short=sec.emoji+' '+words.slice(0,3).join(' ')+(words.length>3?'…':'');
+    const tab=document.createElement('button');
+    tab.className='tab-btn'+(si===0?' active':'');
+    tab.id=`tab-${si}`;
+    tab.innerHTML=`<span class="tab-num">${si+1}</span>${short}`;
+    tab.onclick=()=>switchTab(si);
+    tabsEl.appendChild(tab);
+
+    const panel=document.createElement('div');
+    panel.className='sec-panel'+(si===0?' active':'');
+    panel.id=`sec-${si}`;
+
+    let html=`<h2 class="sec-title">${sec.emoji} ${sec.title}</h2><div class="concept-box">${sec.concept}</div>`;
+
+    sec.levels.forEach((lv,li)=>{
+      const id=`c${si}_${li}`;
+      const m=TIER_META[lv.tier];
+      let body='';
+
+      const noScaffold=['spicy','extra','spicy2','super'].includes(lv.tier);
+      if(lv.vis&&VIS[lv.vis]&&lv.tier!=='extra'&&lv.tier!=='spicy2') body+=VIS[lv.vis];
+      if(lv.problem) body+=`<div class="problem">${lv.problem}</div>`;
+      if(lv.hint&&!noScaffold) body+=`<div class="hint-box">💡 <strong>Hint:</strong> ${lv.hint}</div>`;
+
+      // Steps — only shown for worked/mild/medium
+      if(lv.steps&&lv.steps.length){
+        if(!noScaffold){
+          // Scaffolded tiers (worked/mild/medium): step-by-step check inputs
+        body+=`<div class="steps">`;
+        lv.steps.forEach((st,sti)=>{
+          const sid=`${id}_s${sti}`;
+          STEP_META[sid]={topic:sec.title, label:st.label, ans:st.ans, si:si};
+          body+=`<div class="step">
+            <div class="step-lbl"><span class="step-num">${sti+1}</span>${st.label}</div>
+            ${st.midVis&&VIS[st.midVis]?VIS[st.midVis]:""}
+            <div class="check-input-row">
+              <input class="check-input" id="${sid}_in" type="text" placeholder="✏️ Write your answer here, then click Check…" autocomplete="off">
+              <button class="check-btn" id="${sid}_btn" onclick="checkStep('${sid}')">✔ Check Answer</button>
+            </div>
+            <div class="ai-fb-wrap" id="${sid}_fb"></div>
+            <div class="step-ans" id="${sid}_ans">${st.ans}</div>
+          </div>`;
+        });
+        body+=`</div>`;
+        } else if(!lv.mc&&!lv.parts){
+          // No scaffold + steps only → open response
+          const pid0=`${id}_p0`;
+          const combinedA=lv.steps.map(s=>'<strong>'+s.label.replace(/<[^>]+>/g,'')+'</strong><br>'+s.ans).join('<br><br>');
+          PART_META[pid0]={topic:sec.title,question:'Solve the complete problem. Show all your work.',ans:combinedA,si:si};
+          body+=`<div class="parts"><div class="part">
+            <div class="work-hint">✏️ Solve the full problem — show all your work, then check:</div>
+            <textarea class="work-box" id="${pid0}_work" placeholder="Show your complete work here…"></textarea>
+            <div class="part-ai-fb" id="${pid0}_aifb"></div>
+            <br><button class="show-ans-btn" id="${pid0}_btn" onclick="checkWork('${pid0}','${id}')">✔ Check My Work</button>
+            <div class="ans-reveal" id="${pid0}_ans">${combinedA}</div>
+          </div></div>`;
+        }
+        // noScaffold AND has mc: skip steps, mc renders below
+      }
+
+      // MC
+      if(lv.mc){
+        MC_META[id]={topic:sec.title,question:lv.mcQ||'',correctChoice:lv.mc[lv.mcA],si:si,problem:lv.problem||'',choices:lv.mc||[]};
+        body+=`<hr class="divider"><div class="mc-question">${lv.mcQ||'Choose the correct answer:'}</div><div class="mc-grid" id="${id}_mc">`;
+        lv.mc.forEach((ch,ci)=>{
+          body+=`<button class="mc-opt" data-correct="${ci===lv.mcA}" onclick="checkMC(this,'${id}')">${ch}</button>`;
+        });
+        body+=`</div><div class="mc-feedback" id="${id}_fb"></div><div class="mc-guide-wrap" id="${id}_mcguide" style="display:none;margin-top:4px"></div>`;
+      }
+
+      // Open parts
+      if(lv.parts){
+        body+=`<div class="parts">`;
+        lv.parts.forEach((pt,pi)=>{
+          const pid=`${id}_p${pi}`;
+          PART_META[pid]={topic:sec.title,question:pt.q,ans:pt.ans,si:si};
+          body+=`<div class="part">
+            <div class="part-q">${pt.q}</div>
+            <div class="work-hint">✏️ Write your work below first, then click Show Answer for feedback:</div>
+            <textarea class="work-box" id="${pid}_work" placeholder="Show your work here…"></textarea>
+            <div class="part-ai-fb" id="${pid}_aifb"></div>
+            <br><button class="show-ans-btn" id="${pid}_btn" onclick="checkWork('${pid}','${id}')">✔ Check My Work</button>
+            <div class="ans-reveal" id="${pid}_ans">${pt.ans}</div>
+          </div>`;
+        });
+        body+=`</div>`;
+      }
+
+      html+=`<div class="card t-${lv.tier}" id="${id}_card">
+        <div class="card-hdr" id="${id}_hdr" onclick="toggleCard('${id}')">
+          <div class="tier-left">
+            <div class="tier-icon">${m.icon}</div>
+            <div><div class="tier-name">${m.name}</div><div class="tier-sub">${lv.note}</div></div>
+          </div>
+          <div class="card-right">
+            <span class="done-pill" id="${id}_done">✓ Done!</span>
+            <span class="chev">▼</span>
+          </div>
+        </div>
+        <div class="card-body" id="${id}_body">${body}</div>
+      </div>`;
+    });
+
+    panel.innerHTML=html;
+    sectionsEl.appendChild(panel);
+  });
+
+  toggleCard('c0_0');
+}
+
+function toggleCard(id){
+  const body=document.getElementById(`${id}_body`);
+  const hdr=document.getElementById(`${id}_hdr`);
+  if(!body||!hdr) return;
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  hdr.classList.toggle('open',!open);
+}
+
+function switchTab(idx){
+  document.querySelectorAll('.tab-btn').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.sec-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.markStepDone=markStepDone;
+
+function checkTableInputs(btn){
+  const box=btn.closest('.vis-box');
+  const inputs=Array.from(box.querySelectorAll('.tbl-input[data-answer]'));
+  if(!inputs.length) return;
+  let allOk=true, anyEmpty=false, hints=[];
+  inputs.forEach(inp=>{
+    const raw=inp.value.trim().replace(/[$,%\s]/g,'');
+    if(!raw){inp.style.borderColor='var(--amber)';inp.style.borderStyle='dashed';anyEmpty=true;allOk=false;return;}
+    const val=parseFloat(raw);
+    const ans=parseFloat(inp.dataset.answer);
+    const tol=Math.max(Math.abs(ans)*0.02,0.05);
+    const ok=!isNaN(val)&&Math.abs(val-ans)<=tol;
+    inp.style.borderColor=ok?'var(--green)':'var(--red)';
+    inp.style.borderStyle='solid';
+    if(!ok&&inp.dataset.hint&&!hints.includes(inp.dataset.hint)) hints.push(inp.dataset.hint);
+    if(!ok) allOk=false;
+  });
+  const fb=btn.nextElementSibling;
+  if(!fb) return;
+  if(anyEmpty){
+    fb.innerHTML='Fill in all the blanks first!';
+    fb.style.color='#fde68a';
+  } else if(allOk){
+    fb.innerHTML='Perfect -- all values are correct!';
+    fb.style.color='#86efac';
+  } else {
+    const hHtml=hints.length
+      ?'<br><strong>Hints for red boxes:</strong><ul style="margin:6px 0 0 14px;line-height:1.7">'
+        +hints.map(function(h){return '<li>'+h+'</li>';}).join('')+'</ul>':'';
+    fb.innerHTML='Some boxes need fixing. Check red boxes and try again.'+hHtml;
+    fb.style.color='#fca5a5';
+  }
+  fb.style.display='block';
+}
+
+window.onload=render;
+</script>
+</body>
+</html>
