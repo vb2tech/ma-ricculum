@@ -284,6 +284,27 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .countdown-num{font-family:'Fredoka',sans-serif;font-size:120px;font-weight:700;color:var(--yellow);text-shadow:0 0 60px var(--yellow-glow);animation:cd-pop .8s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes cd-pop{0%{transform:scale(2);opacity:0;}60%{transform:scale(1);opacity:1;}100%{transform:scale(.8);opacity:0;}}
 
+
+/* NINJA EASY — queue highlight (oldest bubble is "active") */
+.bubble.queue-active{
+  border-color:var(--green) !important;
+  box-shadow:0 0 36px var(--green-glow),inset 0 1px 0 rgba(255,255,255,.15) !important;
+  background:linear-gradient(135deg,#0e2e1e,#0d3a24) !important;
+  animation:queue-pulse .7s ease infinite alternate !important;
+  transform:scale(1.08);
+}
+@keyframes queue-pulse{from{box-shadow:0 0 24px var(--green-glow);}to{box-shadow:0 0 52px var(--green-glow),0 0 12px var(--green);}}
+.bubble.queue-waiting{opacity:.55;filter:brightness(.7);}
+/* easy mode: panel always visible — override transform */
+#ninja-input-panel.easy-always{transform:translateY(0) !important;}
+/* order tag on bubble */
+.bubble-order{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:var(--green);color:#003318;
+  font-family:'Fredoka',sans-serif;font-size:12px;font-weight:700;
+  padding:1px 8px;border-radius:999px;white-space:nowrap;
+}
+
 @media(max-width:480px){
   .q-text{font-size:44px;}
   .logo-title{font-size:40px;}
@@ -328,10 +349,15 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="mode-name">Sudden Death</div>
         <div class="mode-desc">1 wrong = game over — go as long as you can!</div>
       </div>
-      <div class="mode-card" data-mode="ninja" onclick="pickMode('ninja',this)" style="grid-column:span 2;border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04);">
+      <div class="mode-card" data-mode="ninja" onclick="pickMode('ninja',this)" style="border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04);">
         <div class="mode-icon">🥷</div>
         <div class="mode-name" style="color:var(--cyan);">Math Ninja</div>
-        <div class="mode-desc">Problems fly around — click to solve before they escape!</div>
+        <div class="mode-desc">Click to solve — 5 lives</div>
+      </div>
+      <div class="mode-card" data-mode="ninja-easy" onclick="pickMode('ninja-easy',this)" style="border-color:rgba(6,214,160,.3);background:rgba(6,214,160,.04);">
+        <div class="mode-icon">🌟</div>
+        <div class="mode-name" style="color:var(--green);">Ninja Easy</div>
+        <div class="mode-desc">Solve in order — no clicking needed!</div>
       </div>
     </div>
     <button class="start-btn" id="start-btn" onclick="startGame()">🚀 Let's Go!</button>
@@ -491,7 +517,8 @@ function show(id){
 
 // ==================== START GAME ====================
 function startGame(){
-  if(selMode==='ninja'){startNinja();return;}
+  if(selMode==='ninja'){startNinja(false);return;}
+  if(selMode==='ninja-easy'){startNinja(true);return;}
   const qCount=selMode==='rush'||selMode==='sudden'?999:20;
   const qs=Array.from({length:qCount},mkQ);
   G={mode:selMode,qs,i:0,score:0,streak:0,hist:[],over:false,timer:null,tl:1.0,answered:false,rushWrong:0};
@@ -713,34 +740,38 @@ const NJ={
   hist:[],
   spawnInterval:3000, // ms between spawns (speeds up over time)
   spawnCount:0,
-  maxBubbles:6
+  maxBubbles:6,
+  easy:false,
+  queue:[]
 };
 
-function startNinja(){
+function startNinja(easyMode){
   show('ninja');
-  // reset state
   Object.assign(NJ,{bubbles:[],selectedId:null,score:0,solved:0,escaped:0,lives:5,
-    over:false,raf:null,spawnTimer:null,hist:[],spawnInterval:3000,spawnCount:0});
+    over:false,raf:null,spawnTimer:null,hist:[],spawnInterval:3000,spawnCount:0,
+    easy:!!easyMode,queue:[]});
   const arena=document.getElementById('ninja-arena');
   arena.innerHTML='';
   const panel=document.getElementById('ninja-input-panel');
-  panel.classList.remove('open');
+  panel.classList.remove('open','easy-always');
   document.getElementById('ninja-ans').value='';
-  document.getElementById('ninja-q-label').textContent='Tap a problem!';
+  if(easyMode){
+    panel.classList.add('easy-always');
+    document.getElementById('ninja-q-label').textContent='Solve the glowing problem!';
+  } else {
+    document.getElementById('ninja-q-label').textContent='Tap a problem!';
+  }
   renderNinjaHearts();
   document.getElementById('nhud-score').textContent='0';
   document.getElementById('nhud-solved').textContent='0';
   document.getElementById('nhud-escaped').textContent='0';
-
-  // measure arena
   NJ.arenaW=window.innerWidth;
   NJ.arenaH=window.innerHeight;
-
-  // countdown then go
   showNinjaCountdown(()=>{
     spawnBubble();spawnBubble();
     scheduleNextSpawn();
     NJ.raf=requestAnimationFrame(ninjaLoop);
+    if(easyMode)updateEasyQueue();
   });
 }
 
@@ -749,7 +780,7 @@ function stopNinja(){
   clearTimeout(NJ.spawnTimer);
   NJ.over=true;
   const arena=document.getElementById('ninja-arena');arena.innerHTML='';
-  document.getElementById('ninja-input-panel').classList.remove('open');
+  document.getElementById('ninja-input-panel').classList.remove('open','easy-always');
 }
 
 function showNinjaCountdown(cb){
@@ -785,26 +816,50 @@ function spawnBubble(){
   el.innerHTML=`<div class="bubble-text">${q.a} <span class="bop">×</span> ${q.b} <span class="bop">=</span> <span style="color:var(--cyan)">?</span></div>`;
   const arena=document.getElementById('ninja-arena');arena.appendChild(el);
 
-  // measure after adding
-  const w=el.offsetWidth||120,h=el.offsetHeight||60;
-  // random edge spawn
-  let x,y,vx,vy;
+  const w=el.offsetWidth||160,h=el.offsetHeight||80;
+  const aW=window.innerWidth, aH=window.innerHeight;
+
+  // Safe zone: avoid HUD at top (70px) and input panel at bottom (easy: 100px, normal: 20px)
+  const safeTop=75, safeBot=NJ.easy?110:28;
+  const safeH=aH-safeTop-safeBot;
+
+  // Spawn from a random edge — position within safe zone
   const side=Math.floor(Math.random()*4);
-  const speed=1.2+Math.random()*1.4+(NJ.spawnCount*0.04);
-  const angle=(Math.random()-.5)*.8;
-  if(side===0){x=Math.random()*(NJ.arenaW-w);y=-h;vx=Math.sin(angle)*speed;vy=speed*Math.cos(angle);}
-  else if(side===1){x=NJ.arenaW;y=Math.random()*(NJ.arenaH-h);vx=-speed*Math.cos(angle);vy=Math.sin(angle)*speed;}
-  else if(side===2){x=Math.random()*(NJ.arenaW-w);y=NJ.arenaH;vx=Math.sin(angle)*speed;vy=-speed*Math.cos(angle);}
-  else{x=-w;y=Math.random()*(NJ.arenaH-h);vx=speed*Math.cos(angle);vy=Math.sin(angle)*speed;}
+  let x,y;
+  if(side===0){       // top edge
+    x=Math.random()*(aW-w); y=safeTop-h;
+  } else if(side===1){ // right edge
+    x=aW; y=safeTop+Math.random()*Math.max(0,safeH-h);
+  } else if(side===2){ // bottom edge
+    x=Math.random()*(aW-w); y=aH-safeBot;
+  } else {            // left edge
+    x=-w; y=safeTop+Math.random()*Math.max(0,safeH-h);
+  }
+
+  // Aim toward a random point well inside the safe zone
+  const targetX=w+(Math.random()*(aW-w*2));
+  const targetY=safeTop+h+(Math.random()*(safeH-h*2));
+  const dx=targetX-x, dy=targetY-y;
+  const dist=Math.sqrt(dx*dx+dy*dy)||1;
+  const speed=1.2+Math.random()*1.2+(NJ.spawnCount*0.035);
+  const vx=(dx/dist)*speed;
+  const vy=(dy/dist)*speed;
 
   const id=_bubbleId++;
   el.dataset.id=id;
-  el.style.left=x+'px';el.style.top=y+'px';
-  el.onclick=()=>selectBubble(id);
+  el.style.left=x+'px'; el.style.top=y+'px';
 
-  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false};
+  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false,spawnOrder:NJ.spawnCount};
+  if(NJ.easy){
+    el.onclick=null;
+    el.style.cursor='default';
+    NJ.queue.push(id);
+  } else {
+    el.onclick=()=>selectBubble(id);
+  }
   NJ.bubbles.push(bub);
   NJ.spawnCount++;
+  if(NJ.easy)updateEasyQueue();
 }
 
 function scheduleNextSpawn(){
@@ -831,13 +886,73 @@ function selectBubble(id){
   setTimeout(()=>inp.focus(),80);
 }
 
+
+function updateEasyQueue(){
+  if(!NJ.easy)return;
+  // rebuild queue from alive bubbles sorted by spawnOrder
+  NJ.queue=NJ.bubbles.filter(b=>b.alive).sort((a,b)=>a.spawnOrder-b.spawnOrder).map(b=>b.id);
+  const activeId=NJ.queue[0]??null;
+  NJ.bubbles.forEach((b,i)=>{
+    if(!b.alive)return;
+    b.el.classList.remove('queue-active','queue-waiting');
+    // remove old order tag
+    const old=b.el.querySelector('.bubble-order');if(old)old.remove();
+    const pos=NJ.queue.indexOf(b.id);
+    if(pos===0){
+      b.el.classList.add('queue-active');
+      const tag=document.createElement('div');tag.className='bubble-order';tag.textContent='Solve me!';
+      b.el.appendChild(tag);
+    } else if(pos>0){
+      b.el.classList.add('queue-waiting');
+      const tag=document.createElement('div');tag.className='bubble-order';tag.textContent='#'+(pos+1);
+      b.el.appendChild(tag);
+    }
+  });
+  // update label
+  const activeBub=NJ.bubbles.find(b=>b.id===activeId&&b.alive);
+  if(activeBub){
+    document.getElementById('ninja-q-label').textContent=activeBub.q.a+' × '+activeBub.q.b+' = ?';
+    setTimeout(()=>document.getElementById('ninja-ans').focus(),30);
+  } else {
+    document.getElementById('ninja-q-label').textContent='Solve the glowing problem!';
+  }
+}
 function ninjaKey(e){if(e.key==='Enter')ninjaSubmit();}
 
 function ninjaSubmit(){
-  if(NJ.selectedId===null||NJ.over)return;
   const raw=document.getElementById('ninja-ans').value.trim();
   if(raw===''||isNaN(raw))return;
   const ua=parseInt(raw,10);
+
+  // ── EASY MODE: solve front of queue ──────────────────────────────
+  if(NJ.easy){
+    if(NJ.queue.length===0||NJ.over)return;
+    const bub=NJ.bubbles.find(b=>b.id===NJ.queue[0]&&b.alive);
+    if(!bub)return;
+    document.getElementById('ninja-ans').value='';
+    if(ua===bub.q.ans){
+      const pts=15;NJ.score+=pts;NJ.solved++;
+      NJ.hist.push({q:`${bub.q.a} × ${bub.q.b}`,correct:bub.q.ans,user:ua,outcome:'correct',pts});
+      bub.alive=false;
+      bub.el.classList.remove('queue-active','queue-waiting');
+      bub.el.classList.add('correct-flash');
+      spawnParticles(bub.el,['✨','⭐','💫','🥷']);
+      setTimeout(()=>{if(bub.el.parentNode)bub.el.remove();},500);
+    } else {
+      NJ.lives--;
+      NJ.hist.push({q:`${bub.q.a} × ${bub.q.b}`,correct:bub.q.ans,user:ua,outcome:'wrong',pts:0});
+      bub.el.classList.add('wrong-flash');
+      setTimeout(()=>bub.el.classList.remove('wrong-flash'),400);
+      flashArena();renderNinjaHearts();
+      if(NJ.lives<=0){NJ.over=true;cancelAnimationFrame(NJ.raf);clearTimeout(NJ.spawnTimer);setTimeout(endNinja,600);return;}
+    }
+    updateNinjaHud();
+    setTimeout(updateEasyQueue,520);
+    return;
+  }
+
+  // ── STANDARD MODE: solve selected bubble ─────────────────────────
+  if(NJ.selectedId===null||NJ.over)return;
   const bub=NJ.bubbles.find(b=>b.id===NJ.selectedId&&b.alive);
   if(!bub)return;
 
@@ -878,15 +993,24 @@ function ninjaLoop(ts){
   const aW=window.innerWidth,aH=window.innerHeight;
   const toRemove=[];
 
+  const safeTop=75, safeBot=NJ.easy?110:28;
+
   NJ.bubbles.forEach(bub=>{
     if(!bub.alive)return;
     bub.x+=bub.vx*(dt/16);
     bub.y+=bub.vy*(dt/16);
+
+    // Bounce off safe zone walls — keeps bubbles fully visible
+    if(bub.x<=0){bub.x=0;bub.vx=Math.abs(bub.vx);}
+    else if(bub.x+bub.w>=aW){bub.x=aW-bub.w;bub.vx=-Math.abs(bub.vx);}
+    if(bub.y<=safeTop){bub.y=safeTop;bub.vy=Math.abs(bub.vy);}
+    else if(bub.y+bub.h>=aH-safeBot){bub.y=aH-safeBot-bub.h;bub.vy=-Math.abs(bub.vy);}
+
     bub.el.style.left=bub.x+'px';
     bub.el.style.top=bub.y+'px';
 
-    // escaped off screen?
-    if(bub.x>aW+20||bub.x<-bub.w-20||bub.y>aH+20||bub.y<-bub.h-20){
+    // Only escape if launched far outside (shouldn't normally happen after bounce)
+    if(bub.x>aW+60||bub.x<-bub.w-60||bub.y>aH+60||bub.y<-bub.h-60){
       toRemove.push(bub);
     }
   });
@@ -897,6 +1021,7 @@ function ninjaLoop(ts){
     NJ.hist.push({q:`${bub.q.a} × ${bub.q.b}`,correct:bub.q.ans,user:null,outcome:'wrong',pts:0});
     renderNinjaHearts();
     flashArena();
+    if(NJ.easy)updateEasyQueue();
     if(NJ.lives<=0){NJ.over=true;cancelAnimationFrame(NJ.raf);clearTimeout(NJ.spawnTimer);setTimeout(endNinja,600);return;}
   });
   NJ.bubbles=NJ.bubbles.filter(b=>b.alive||b.el.parentNode);
