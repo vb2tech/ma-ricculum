@@ -43,10 +43,38 @@ body {
   color: #6c7086;
 }
 
+.nav-section {
+  padding-top: 0.5rem;
+}
+
+.nav-section + .nav-section {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+}
+
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #45475a;
+  padding: 0 1rem 0.35rem;
+}
+
 .artifact-list {
   list-style: none;
-  padding: 0.5rem 0;
-  flex: 1;
+  padding: 0 0 0.5rem;
+}
+
+.artifact-btn-sub {
+  padding-left: 1.75rem;
+  opacity: 0.85;
+}
+
+.artifact-btn-sub .artifact-name {
+  font-size: 0.8rem;
+  font-weight: 400;
 }
 
 .artifact-btn {
@@ -89,6 +117,80 @@ body {
   background: #fff;
   display: flex;
   flex-direction: column;
+}
+
+/* Game picker */
+.picker-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #f8f9fa;
+}
+
+.picker-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.picker-header h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0.35rem;
+}
+
+.picker-header p {
+  font-size: 0.95rem;
+  color: #888;
+}
+
+.picker-grid {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.picker-card {
+  width: 200px;
+  padding: 1.5rem 1.25rem;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.picker-card:hover {
+  border-color: #cba6f7;
+  box-shadow: 0 4px 20px rgba(203,166,247,0.25);
+  transform: translateY(-2px);
+}
+
+.picker-card-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.picker-card-desc {
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.4;
+}
+
+.picker-card-cta {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cba6f7;
 }
 
 .empty-state {
