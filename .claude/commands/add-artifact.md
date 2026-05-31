@@ -1,16 +1,18 @@
-Add a new artifact to the ma-ricculum site and deploy it.
+Add a new artifact to the ma-ricculum site and deploy it — fully automated, no user input required.
 
 ## Steps
 
 1. **Find unregistered HTML files**
-   - Read `src/artifacts/index.js` to see what's already registered (look for existing import paths)
-   - List files in `public/artifacts/` 
+   - Read `src/artifacts/index.js` to see what's already registered
+   - List files in `public/artifacts/`
    - Identify any `.html` files not yet imported in `index.js`
+   - If none, tell the user to drop their `.html` file into `public/artifacts/` first, then re-run `/add-artifact`.
 
-2. **For each unregistered file**, ask the user:
-   - Display name (e.g. "Unit 6 Study Guide")
-   - Short description (e.g. "Percentages · Proportional Relationships")
-   - A slug ID (suggest one based on the filename, e.g. `unit6-study-guide`)
+2. **For each unregistered file, derive all metadata automatically — do NOT ask the user:**
+   - **Slug**: the filename without `.html` (e.g. `division-quest`)
+   - **Display name**: title-case the slug, replacing hyphens with spaces (e.g. `Division Quest`)
+   - **Description**: read the first ~50 lines of the HTML file to understand its purpose, then write a short 3–6 word description in the style of existing entries (e.g. `"Quick arithmetic practice"`, `"Interactive division challenges"`, `"Percentages · Proportional Relationships · Unit Rates"`). Use `·` as a separator if listing topics.
+   - **ComponentName**: PascalCase version of the slug (e.g. `DivisionQuest`)
 
 3. **Create the JSX wrapper** at `src/artifacts/<ComponentName>.jsx`:
    ```jsx
@@ -24,7 +26,6 @@ Add a new artifact to the ma-ricculum site and deploy it.
      )
    }
    ```
-   Derive `<ComponentName>` from the slug in PascalCase (e.g. `unit6-study-guide` → `Unit6StudyGuide`).
 
 4. **Update `src/artifacts/index.js`** — add the import at the top and a new entry to the array:
    ```js
@@ -35,15 +36,14 @@ Add a new artifact to the ma-ricculum site and deploy it.
 
 5. **Run `npm run build`** to verify no errors.
 
-6. **Commit and push**:
+6. **Commit and push** (include both the HTML file and the new source files):
    ```
-   git add .
+   git add public/artifacts/<filename>.html src/artifacts/<ComponentName>.jsx src/artifacts/index.js
    git commit -m "add: <Display Name> artifact"
    git push origin main
    ```
    GitHub Actions will deploy automatically (~60s).
 
 ## Notes
-- If the user already placed the HTML file in `public/artifacts/` before running this command, skip straight to step 2.
-- If there are no unregistered files, tell the user to drop their `.html` file into `public/artifacts/` first, then re-run `/add-artifact`.
+- Never prompt the user for name, description, or slug — infer everything from the filename and HTML content.
 - For React JSX artifacts (not HTML), the component goes directly in `src/artifacts/` with no iframe wrapper needed — just import and register it.
