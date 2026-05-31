@@ -12,7 +12,6 @@ export default function App() {
       <nav className="sidebar">
         <div className="sidebar-header">
           <h1>Ma-ricculum</h1>
-          <p>Claude Artifacts</p>
         </div>
         <ul className="artifact-list">
           {artifacts.map(artifact => (
