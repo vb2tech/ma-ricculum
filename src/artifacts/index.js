@@ -1,5 +1,6 @@
 import Unit6StudyGuide from './Unit6StudyGuide.jsx'
 import FastMath from './FastMath.jsx'
+import DivisionQuest from './DivisionQuest.jsx'
 
 // To add a new artifact:
 // 1. Drop the file into public/artifacts/ (HTML) or src/artifacts/ (JSX)
@@ -18,6 +19,12 @@ const artifacts = [
     name: 'Fast Math',
     description: 'Quick arithmetic practice',
     component: FastMath,
+  },
+  {
+    id: 'division-quest',
+    name: 'Division Quest',
+    description: 'Interactive division challenges',
+    component: DivisionQuest,
   },
 ]
 
