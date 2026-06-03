@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Times Table Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #6C3CE1;
+    --purple-light: #8B5CF6;
+    --gold: #F59E0B;
+    --teal: #06B6D4;
+    --green: #10B981;
+    --red: #EF4444;
+    --bg: #0F0A1E;
+    --text: #F0E6FF;
+    --text2: #B39DDB;
+    --card: rgba(108,60,225,0.12);
+    --card-border: rgba(139,92,246,0.3);
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 50% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 35% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 45%, rgba(200,180,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 35%, rgba(200,180,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 45% 90%, rgba(255,255,255,0.3) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 20%, rgba(108,60,225,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 300px at 80% 80%, rgba(6,182,212,0.1) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 500px at 60% 30%, rgba(245,158,11,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: nebula 8s ease-in-out infinite alternate;
+  }
+  @keyframes nebula { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  header { text-align: center; margin-bottom: 24px; animation: fadeDown 0.6s ease both; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(32px, 6vw, 52px);
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 30%, #8B5CF6 70%, #06B6D4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titlePulse 3s ease-in-out infinite alternate;
+  }
+  @keyframes titlePulse {
+    0%   { filter: drop-shadow(0 0 15px rgba(245,158,11,0.3)); }
+    100% { filter: drop-shadow(0 0 30px rgba(139,92,246,0.5)); }
+  }
+
+  header p { font-size: 15px; color: var(--text2); margin-top: 4px; font-weight: 600; }
+
+  .mode-tabs {
+    display: flex; gap: 8px; justify-content: center;
+    margin-bottom: 20px; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .mode-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 15px; padding: 10px 22px; border-radius: 50px;
+    border: 2px solid var(--card-border); background: var(--card);
+    color: var(--text2); cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .mode-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--purple), var(--teal));
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .mode-btn span { position: relative; z-index: 1; }
+  .mode-btn:hover { border-color: var(--purple-light); color: var(--text); transform: translateY(-2px); }
+  .mode-btn.active { border-color: transparent; color: #fff; box-shadow: 0 0 20px rgba(108,60,225,0.5); transform: translateY(-2px); }
+  .mode-btn.active::before { opacity: 1; }
+
+  .stats-bar {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .stat-pill {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 50px; padding: 7px 16px; font-size: 14px;
+    font-weight: 700; color: var(--text2); display: flex; align-items: center; gap: 6px;
+  }
+  .stat-pill .val { color: var(--gold); font-family: 'Fredoka One', cursive; font-size: 16px; }
+  .stat-pill.timer-warn .val { color: var(--red); animation: timerWarn 0.5s ease infinite alternate; }
+  @keyframes timerWarn { from { transform: scale(1); } to { transform: scale(1.15); } }
+
+  /* Score bounce — uses transform only (animatable) */
+  @keyframes scoreBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.6); }
+    60%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+  .val.bounce { animation: scoreBounce 0.45s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  .difficulty-row {
+    display: flex; gap: 8px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .diff-btn {
+    font-family: 'Fredoka One', cursive; font-size: 13px;
+    padding: 7px 16px; border-radius: 50px;
+    border: 2px solid var(--card-border); background: var(--card);
+    color: var(--text2); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .diff-btn:hover { border-color: var(--green); color: var(--text); }
+  .diff-btn.active { background: var(--green); border-color: var(--green); color: #fff; box-shadow: 0 0 15px rgba(16,185,129,0.4); }
+
+  .action-row {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .action-btn {
+    font-family: 'Fredoka One', cursive; font-size: 16px;
+    padding: 11px 28px; border-radius: 50px; border: none;
+    cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .action-btn:hover { transform: translateY(-3px) scale(1.03); }
+  .action-btn:active { transform: scale(0.97); }
+  .action-btn.primary { background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; box-shadow: 0 4px 20px rgba(108,60,225,0.5); }
+  .action-btn.danger  { background: linear-gradient(135deg, #B91C1C, var(--red)); color: #fff; box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
+  .action-btn.success { background: linear-gradient(135deg, #059669, var(--green)); color: #fff; box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
+
+  .message-banner {
+    text-align: center; padding: 12px 20px; border-radius: 16px;
+    font-size: 16px; font-weight: 800; margin-bottom: 16px; display: none;
+  }
+  .message-banner.success { background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,182,212,0.15)); border: 1px solid rgba(16,185,129,0.5); color: #6EE7B7; display: block; }
+  .message-banner.fail    { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.1)); border: 1px solid rgba(239,68,68,0.4); color: #FCA5A5; display: block; }
+  .message-banner.info    { background: linear-gradient(135deg, rgba(108,60,225,0.2), rgba(6,182,212,0.1)); border: 1px solid rgba(139,92,246,0.4); color: #C4B5FD; display: block; }
+
+  .mode-desc {
+    text-align: center; font-size: 14px; color: var(--text2);
+    font-weight: 600; margin-bottom: 14px; min-height: 20px;
+  }
+
+  .table-wrap {
+    overflow-x: auto; border-radius: 20px;
+    border: 1px solid var(--card-border); background: var(--card);
+    padding: 8px; backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(108,60,225,0.2), inset 0 0 40px rgba(0,0,0,0.3);
+  }
+
+  table.times-table { border-collapse: collapse; margin: 0 auto; font-size: 12px; }
+  table.times-table td {
+    width: 44px; height: 36px; text-align: center; vertical-align: middle;
+    border: 1px solid rgba(139,92,246,0.1); position: relative;
+    transition: background 0.2s; font-weight: 700; overflow: visible;
+  }
+  table.times-table .header-cell {
+    background: rgba(108,60,225,0.4); color: #C4B5FD;
+    font-family: 'Fredoka One', cursive; font-size: 13px;
+    border-color: rgba(139,92,246,0.3);
+  }
+  table.times-table .corner-cell {
+    background: rgba(76,29,149,0.6); color: var(--gold);
+    font-family: 'Fredoka One', cursive; font-size: 14px;
+  }
+  table.times-table .data-cell {
+    background: rgba(15,10,30,0.6); color: var(--text); font-size: 12px; font-weight: 700;
+  }
+  table.times-table .data-cell:hover { background: rgba(108,60,225,0.2); }
+
+  /* FIX: z-index on table cells requires position */
+  table.times-table .data-cell.filled-correct {
+    position: relative; z-index: 10;
+    background: rgba(16,185,129,0.35) !important;
+    color: #6EE7B7;
+    box-shadow: 0 0 18px rgba(16,185,129,0.7), 0 0 40px rgba(16,185,129,0.3) !important;
+    border-color: rgba(16,185,129,0.8) !important;
+    animation: cellPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+  @keyframes cellPop {
+    0%   { transform: scale(1);    filter: brightness(1); }
+    20%  { transform: scale(1.55); filter: brightness(2.2); }
+    50%  { transform: scale(1.25); filter: brightness(1.6); }
+    75%  { transform: scale(1.1);  filter: brightness(1.2); }
+    100% { transform: scale(1);    filter: brightness(1); }
+  }
+
+  table.times-table .data-cell.filled-wrong {
+    background: rgba(239,68,68,0.3) !important; color: #FCA5A5;
+    box-shadow: 0 0 14px rgba(239,68,68,0.6) !important;
+    animation: cellShake 0.35s ease both;
+  }
+  @keyframes cellShake {
+    0%   { transform: translateX(0) rotate(0deg); }
+    20%  { transform: translateX(-6px) rotate(-3deg); }
+    40%  { transform: translateX(6px) rotate(3deg); }
+    60%  { transform: translateX(-4px) rotate(-2deg); }
+    80%  { transform: translateX(4px) rotate(2deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+  }
+
+  table.times-table .data-cell.missing {
+    background: rgba(139,92,246,0.2) !important; cursor: pointer;
+    border-color: rgba(139,92,246,0.4);
+    animation: missingPulse 2s ease-in-out infinite;
+  }
+  @keyframes missingPulse {
+    0%, 100% { border-color: rgba(139,92,246,0.4); }
+    50%       { border-color: rgba(139,92,246,0.8); }
+  }
+  table.times-table .data-cell.missing:hover { background: rgba(139,92,246,0.4) !important; }
+
+  table.times-table input.cell-input {
+    width: 100%; height: 100%; border: none; background: transparent;
+    text-align: center; font-size: 12px; font-family: 'Nunito', sans-serif;
+    font-weight: 700; color: var(--text); outline: none; padding: 0;
+    caret-color: var(--gold);
+  }
+  table.times-table .data-cell.filled-correct input { color: #6EE7B7; }
+  table.times-table .data-cell.filled-wrong input   { color: #FCA5A5; }
+
+  /* Floating popup */
+  .score-popup {
+    position: absolute; /* absolute inside <td> so scroll doesn't matter */
+    font-family: 'Fredoka One', cursive; font-size: 20px; color: #FCD34D;
+    pointer-events: none; z-index: 9999; white-space: nowrap;
+    text-shadow: 0 0 10px rgba(245,158,11,0.9), 0 2px 4px rgba(0,0,0,0.7);
+    animation: floatUp 0.9s ease-out forwards;
+    top: -4px; left: 50%; transform: translateX(-50%);
+  }
+  @keyframes floatUp {
+    0%   { opacity: 1;  transform: translateX(-50%) translateY(0)   scale(1); }
+    30%  { opacity: 1;  transform: translateX(-50%) translateY(-16px) scale(1.25); }
+    100% { opacity: 0;  transform: translateX(-50%) translateY(-55px) scale(0.8); }
+  }
+
+  /* Screen flash */
+  #flash-screen {
+    position: fixed; inset: 0; pointer-events: none; z-index: 8000; opacity: 0;
+  }
+  #flash-screen.flash-green { background: radial-gradient(ellipse at center, rgba(16,185,129,0.35) 0%, transparent 70%); animation: screenFlash 0.4s ease-out forwards; }
+  #flash-screen.flash-red   { background: radial-gradient(ellipse at center, rgba(239,68,68,0.3)   0%, transparent 70%); animation: screenFlash 0.35s ease-out forwards; }
+  @keyframes screenFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+  #spark-canvas  { position: fixed; inset: 0; pointer-events: none; z-index: 8500; display: block; }
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none; }
+
+  @media (max-width: 600px) {
+    table.times-table td { width: 30px; height: 28px; font-size: 10px; }
+    table.times-table .header-cell { font-size: 10px; }
+    table.times-table input.cell-input { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="flash-screen"></div>
+<canvas id="spark-canvas"></canvas>
+
+<div class="wrapper">
+  <header>
+    <h1>⚡ Times Table Challenge</h1>
+    <p>12 × 12 multiplication mastery — can you beat the clock?</p>
+  </header>
+
+  <div class="mode-tabs">
+    <button class="mode-btn active" onclick="setMode('view',this)"><span>👀 View Table</span></button>
+    <button class="mode-btn" onclick="setMode('fill',this)"><span>✏️ Fill It In</span></button>
+    <button class="mode-btn" onclick="setMode('challenge',this)"><span>🔥 Challenge</span></button>
+  </div>
+
+  <div id="message-banner" class="message-banner"></div>
+
+  <div id="stats-bar" class="stats-bar" style="display:none">
+    <div class="stat-pill">⏱ Time: <span class="val" id="timer-val">0s</span></div>
+    <div class="stat-pill">✅ Correct: <span class="val" id="correct-val">0</span></div>
+    <div class="stat-pill">❌ Wrong: <span class="val" id="wrong-val">0</span></div>
+    <div class="stat-pill" id="missing-pill" style="display:none">🟣 Left: <span class="val" id="missing-val">0</span></div>
+    <div class="stat-pill" id="score-pill" style="display:none">⭐ Score: <span class="val" id="score-val">0</span></div>
+  </div>
+
+  <div id="difficulty-row" class="difficulty-row" style="display:none">
+    <button class="diff-btn active" onclick="setDifficulty('easy',this)">🟢 Easy (25%)</button>
+    <button class="diff-btn" onclick="setDifficulty('medium',this)">🟡 Medium (50%)</button>
+    <button class="diff-btn" onclick="setDifficulty('hard',this)">🔴 Hard (75%)</button>
+    <button class="diff-btn" onclick="setDifficulty('extreme',this)">💀 Extreme (90%)</button>
+  </div>
+
+  <div class="action-row">
+    <button class="action-btn primary" id="main-action-btn" onclick="mainAction()" style="display:none">▶ Start</button>
+    <button class="action-btn danger"  id="reset-btn"       onclick="resetGame()"  style="display:none">↺ Reset</button>
+    <button class="action-btn success" id="reveal-btn"      onclick="revealAll()"  style="display:none">✓ Reveal All</button>
+  </div>
+
+  <div id="mode-desc" class="mode-desc"></div>
+
+  <div class="table-wrap">
+    <table class="times-table" id="main-table"></table>
+  </div>
+</div>
+
+<script>
+/* ── State ── */
+let currentMode    = 'view';
+let gameState      = 'idle';
+let timerInterval  = null;
+let elapsedSeconds = 0;
+let countdownSecs  = 0;
+let correctCount   = 0;
+let wrongCount     = 0;
+let score          = 0;
+let difficulty     = 'easy';
+let missingCells   = [];
+let totalMissing   = 0;
+let challengePhase = 'memorize';
+
+const DIFF_PCTS = { easy:0.25, medium:0.5, hard:0.75, extreme:0.9 };
+const MEM_TIME  = { easy:10,   medium:8,   hard:6,    extreme:4   };
+const ANS_TIME  = { easy:120,  medium:90,  hard:60,   extreme:45  };
+
+const CELL_COLORS = [
+  [1,12,'#7C3AED'],[13,36,'#0891B2'],
+  [37,72,'#059669'],[73,108,'#D97706'],[109,144,'#DC2626']
+];
+function getCellColor(v) {
+  for (const [lo,hi,col] of CELL_COLORS) if (v>=lo && v<=hi) return col;
+  return '#DC2626';
+}
+
+/* ── Spark canvas — initialised after DOM ready ── */
+let sparkCanvas, sparkCtx, sparks = [], sparkRAF = null;
+
+function initSparks() {
+  sparkCanvas = document.getElementById('spark-canvas');
+  sparkCtx    = sparkCanvas.getContext('2d');
+  resizeSparks();
+  window.addEventListener('resize', resizeSparks);
+}
+function resizeSparks() {
+  sparkCanvas.width  = window.innerWidth;
+  sparkCanvas.height = window.innerHeight;
+}
+
+function drawSparks() {
+  sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+  sparks = sparks.filter(s => s.life > 0);
+  sparks.forEach(s => {
+    s.x  += s.vx;
+    s.y  += s.vy;
+    s.vy += 0.18;
+    s.vx *= 0.97;
+    s.life -= 3;
+    const a = Math.max(0, s.life / 100);
+    sparkCtx.beginPath();
+    /* FIX: use rgba() instead of hex+alpha concat */
+    sparkCtx.arc(s.x, s.y, s.r * a, 0, Math.PI * 2);
+    sparkCtx.fillStyle = s.rgba.replace('A', a.toFixed(2));
+    sparkCtx.fill();
+  });
+  if (sparks.length > 0) { sparkRAF = requestAnimationFrame(drawSparks); }
+  else { sparkCtx.clearRect(0,0,sparkCanvas.width,sparkCanvas.height); sparkRAF = null; }
+}
+
+/* FIX: sparkBurst takes the td element; uses fixed-position coords correctly */
+function sparkBurst(td) {
+  const rect = td.getBoundingClientRect();
+  const cx = rect.left + rect.width  / 2;
+  const cy = rect.top  + rect.height / 2;
+  /* rgba strings with placeholder A for alpha */
+  const rgbas = [
+    'rgba(252,211,77,A)','rgba(16,185,129,A)','rgba(6,182,212,A)',
+    'rgba(139,92,246,A)','rgba(245,158,11,A)','rgba(110,231,183,A)','rgba(255,255,255,A)'
+  ];
+  for (let i = 0; i < 30; i++) {
+    const angle = (Math.PI * 2 * i) / 30 + Math.random() * 0.3;
+    const speed = 2.5 + Math.random() * 4.5;
+    sparks.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      r:  2 + Math.random() * 3,
+      rgba: rgbas[Math.floor(Math.random() * rgbas.length)],
+      life: 60 + Math.random() * 40,
+    });
+  }
+  if (!sparkRAF) sparkRAF = requestAnimationFrame(drawSparks);
+}
+
+function flashScreen(type) {
+  const el = document.getElementById('flash-screen');
+  el.className = '';
+  void el.offsetWidth; /* force reflow to restart animation */
+  el.className = 'flash-' + type;
+}
+
+/* FIX: popup is absolutely positioned inside the td, no scroll offset needed */
+function floatingPopup(td, text) {
+  const el = document.createElement('div');
+  el.className  = 'score-popup';
+  el.textContent = text;
+  td.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function bounceScore() {
+  const el = document.getElementById('correct-val');
+  el.classList.remove('bounce');
+  void el.offsetWidth;
+  el.classList.add('bounce');
+  setTimeout(() => el.classList.remove('bounce'), 450);
+}
+
+/* ── Mode / difficulty ── */
+function setMode(mode, btn) {
+  currentMode = mode;
+  stopAllTimers();
+  gameState = 'idle';
+  correctCount = 0; wrongCount = 0; score = 0;
+  missingCells = []; totalMissing = 0;
+  elapsedSeconds = 0; countdownSecs = 0;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  hideBanner();
+  updateTimerDisplay();
+  updateScoreDisplay();
+  buildTable();
+  updateUI();
+}
+
+function setDifficulty(diff, btn) {
+  difficulty = diff;
+  /* FIX: store the clicked btn reference before resetGame wipes active classes */
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (gameState !== 'idle') {
+    stopAllTimers();
+    gameState = 'idle';
+    correctCount = 0; wrongCount = 0; score = 0;
+    missingCells = []; totalMissing = 0;
+    elapsedSeconds = 0; countdownSecs = 0;
+    hideBanner();
+    updateTimerDisplay();
+    updateScoreDisplay();
+    buildTable();
+    updateUI();
+    /* re-apply active after buildTable/updateUI don't touch diff buttons */
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function updateUI() {
+  const statsBar   = document.getElementById('stats-bar');
+  const diffRow    = document.getElementById('difficulty-row');
+  const mainBtn    = document.getElementById('main-action-btn');
+  const resetBtn   = document.getElementById('reset-btn');
+  const revealBtn  = document.getElementById('reveal-btn');
+  const modeDesc   = document.getElementById('mode-desc');
+  const missingPill = document.getElementById('missing-pill');
+  const scorePill   = document.getElementById('score-pill');
+
+  if (currentMode === 'view') {
+    statsBar.style.display  = 'none';
+    diffRow.style.display   = 'none';
+    mainBtn.style.display   = 'none';
+    resetBtn.style.display  = 'none';
+    revealBtn.style.display = 'none';
+    modeDesc.textContent = '✨ Study the table, then pick a mode to practice!';
+  } else if (currentMode === 'fill') {
+    statsBar.style.display   = 'flex';
+    missingPill.style.display = 'none';
+    scorePill.style.display   = 'none';
+    diffRow.style.display     = 'none';
+    mainBtn.style.display     = gameState === 'idle' ? 'inline-block' : 'none';
+    mainBtn.textContent       = '▶ Start Timer';
+    resetBtn.style.display    = gameState !== 'idle' ? 'inline-block' : 'none';
+    revealBtn.style.display   = gameState === 'running' ? 'inline-block' : 'none';
+    modeDesc.textContent = gameState === 'idle'
+      ? '✏️ Fill in ALL 144 cells as fast as you can!'
+      : '⚡ Keep going — you got this!';
+  } else if (currentMode === 'challenge') {
+    statsBar.style.display    = 'flex';
+    missingPill.style.display = 'inline-flex';
+    scorePill.style.display   = 'inline-flex';
+    diffRow.style.display     = 'flex';
+    mainBtn.style.display     = gameState === 'idle' ? 'inline-block' : 'none';
+    mainBtn.textContent       = '▶ Start Challenge';
+    resetBtn.style.display    = gameState !== 'idle' ? 'inline-block' : 'none';
+    revealBtn.style.display   = 'none';
+    modeDesc.textContent = gameState === 'idle'
+      ? '🧠 Memorize the table — then fill in the missing cells!'
+      : challengePhase === 'memorize'
+        ? '🧠 Memorize it! Disappearing soon...'
+        : '⚡ Fill in the purple cells before time runs out!';
+  }
+}
+
+/* ── Table builder ── */
+function buildTable() {
+  const table = document.getElementById('main-table');
+  table.innerHTML = '';
+  missingCells = [];
+
+  const hr = table.insertRow();
+  const corner = hr.insertCell();
+  corner.textContent = '×';
+  corner.className = 'corner-cell';
+  for (let c = 1; c <= 12; c++) {
+    const th = hr.insertCell();
+    th.textContent = c;
+    th.className = 'header-cell';
+  }
+
+  for (let r = 1; r <= 12; r++) {
+    const row = table.insertRow();
+    const rh = row.insertCell();
+    rh.textContent = r;
+    rh.className = 'header-cell';
+
+    for (let c = 1; c <= 12; c++) {
+      const td  = row.insertCell();
+      const val = r * c;
+      td.dataset.answer = val;
+      td.dataset.r = r;
+      td.dataset.c = c;
+
+      if (currentMode === 'view') {
+        td.className = 'data-cell';
+        td.textContent = val;
+        td.style.color = getCellColor(val);
+      } else if (currentMode === 'fill') {
+        td.className = 'data-cell';
+        if (gameState === 'running') {
+          td.appendChild(makeInput(val, r, c, onFillInput));
+        }
+      } else if (currentMode === 'challenge') {
+        td.className = 'data-cell';
+        td.textContent = val;
+        td.style.color = getCellColor(val);
+      }
+    }
+  }
+}
+
+function makeInput(answer, r, c, handler) {
+  const inp = document.createElement('input');
+  inp.type       = 'text';
+  inp.inputMode  = 'numeric';
+  inp.className  = 'cell-input';
+  inp.maxLength  = 3;
+  inp.dataset.answer = answer;
+  inp.dataset.r = r;
+  inp.dataset.c = c;
+  inp.addEventListener('input',   handler);
+  inp.addEventListener('keydown', onKeydown);
+  return inp;
+}
+
+/* ── Game flow ── */
+function mainAction() {
+  if (currentMode === 'fill'      && gameState === 'idle') startFillMode();
+  if (currentMode === 'challenge' && gameState === 'idle') startChallengeMode();
+}
+
+function startFillMode() {
+  gameState = 'running';
+  elapsedSeconds = 0;
+  correctCount = 0; wrongCount = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => { elapsedSeconds++; updateTimerDisplay(); }, 1000);
+  buildTable();
+  updateUI();
+  const first = document.querySelector('.cell-input');
+  if (first) first.focus();
+}
+
+function startChallengeMode() {
+  gameState = 'running';
+  challengePhase = 'memorize';
+  correctCount = 0; wrongCount = 0; score = 0;
+  updateScoreDisplay();
+  buildTable();
+  updateUI();
+
+  countdownSecs = MEM_TIME[difficulty];
+  updateTimerDisplay();
+  showBanner('🧠 Memorize the table! Disappearing in ' + countdownSecs + 's...', 'info');
+
+  timerInterval = setInterval(() => {
+    countdownSecs--;
+    document.getElementById('timer-val').textContent = countdownSecs + 's';
+    if (countdownSecs <= 0) { stopAllTimers(); startAnswerPhase(); }
+  }, 1000);
+}
+
+function startAnswerPhase() {
+  challengePhase = 'answer';
+  const table    = document.getElementById('main-table');
+  const allCells = table.querySelectorAll('.data-cell');
+  const numMissing = Math.max(1, Math.round(144 * DIFF_PCTS[difficulty]));
+  totalMissing = numMissing;
+
+  const indices = [...Array(144).keys()];
+  shuffle(indices);
+  const missingSet = new Set(indices.slice(0, numMissing));
+
+  allCells.forEach((td, i) => {
+    if (missingSet.has(i)) {
+      td.className = 'data-cell missing';
+      td.style.color = '';
+      td.textContent = '';
+      missingCells.push(td);
+      td.appendChild(makeInput(td.dataset.answer, td.dataset.r, td.dataset.c, onChallengeInput));
+    }
+  });
+
+  updateMissingDisplay();
+  countdownSecs = ANS_TIME[difficulty];
+  updateTimerDisplay();
+  updateUI();
+  showBanner('⚡ Go! Fill the purple cells before time runs out! +10 correct / -3 wrong', 'info');
+
+  timerInterval = setInterval(() => {
+    countdownSecs--;
+    const timerEl = document.getElementById('timer-val');
+    timerEl.textContent = countdownSecs + 's';
+    if (countdownSecs <= 10) timerEl.closest('.stat-pill').classList.add('timer-warn');
+    if (countdownSecs <= 0)  { stopAllTimers(); endChallenge(false); }
+  }, 1000);
+
+  const first = document.querySelector('.missing input');
+  if (first) first.focus();
+}
+
+/* ── Input handlers ── */
+function onFillInput(e) {
+  const inp    = e.target;
+  const td     = inp.parentElement;
+  /* Ignore if already marked correct */
+  if (td.classList.contains('filled-correct')) return;
+
+  const val    = parseInt(inp.value, 10);
+  const answer = parseInt(inp.dataset.answer, 10);
+
+  if (!isNaN(val) && val === answer) {
+    /* FIX: disable input so it can't be overwritten, show value as text */
+    inp.disabled = true;
+    td.className = 'data-cell filled-correct';
+    sparkBurst(td);
+    flashScreen('green');
+    floatingPopup(td, '✓');
+    bounceScore();
+    correctCount++;
+    updateScoreDisplay();
+    if (correctCount === 144) endFillMode();
+    else focusNext(inp);
+  } else if (inp.value.length >= Number(inp.maxLength)) {
+    /* FIX: shake, then clear so the kid can try again */
+    td.className = 'data-cell filled-wrong';
+    flashScreen('red');
+    wrongCount++;
+    updateScoreDisplay();
+    setTimeout(() => {
+      td.className = 'data-cell';
+      inp.value = '';
+      inp.focus();
+    }, 380);
+  }
+}
+
+function onChallengeInput(e) {
+  const inp    = e.target;
+  const td     = inp.parentElement;
+  if (td.classList.contains('filled-correct')) return;
+
+  const val    = parseInt(inp.value, 10);
+  const answer = parseInt(inp.dataset.answer, 10);
+
+  if (!isNaN(val) && val === answer) {
+    inp.disabled = true;
+    td.className = 'data-cell filled-correct';
+    td.style.color = '';
+    sparkBurst(td);
+    flashScreen('green');
+    floatingPopup(td, '+10!');
+    bounceScore();
+    correctCount++;
+    score += 10;
+    totalMissing--;
+    updateMissingDisplay();
+    updateScoreDisplay();
+    if (totalMissing <= 0) { stopAllTimers(); endChallenge(true); }
+    else focusNext(inp);
+  } else if (inp.value.length >= Number(inp.maxLength)) {
+    /* FIX: shake then reset, keep the cell as missing so they can retry */
+    td.className = 'data-cell filled-wrong missing';
+    flashScreen('red');
+    wrongCount++;
+    score = Math.max(0, score - 3);
+    updateScoreDisplay();
+    setTimeout(() => {
+      td.className = 'data-cell missing';
+      inp.value = '';
+      inp.focus();
+    }, 380);
+  }
+}
+
+function onKeydown(e) {
+  if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); focusNext(e.target); }
+}
+
+/* FIX: skip disabled (already correct) inputs when tabbing */
+function focusNext(inp) {
+  let r = parseInt(inp.dataset.r);
+  let c = parseInt(inp.dataset.c);
+  for (let i = 0; i < 144; i++) {
+    c++; if (c > 12) { c = 1; r++; } if (r > 12) { r = 1; c = 1; }
+    const next = document.querySelector(
+      `input[data-r="${r}"][data-c="${c}"]:not(:disabled)`
+    );
+    if (next) { next.focus(); break; }
+  }
+}
+
+/* ── End states ── */
+function endFillMode() {
+  gameState = 'done';
+  stopAllTimers();
+  const m = Math.floor(elapsedSeconds / 60), s = elapsedSeconds % 60;
+  const t = m > 0 ? `${m}m ${s}s` : `${s}s`;
+  showBanner(`🎉 Amazing! Completed in ${t} with ${wrongCount} mistake${wrongCount !== 1 ? 's' : ''}!`, 'success');
+  launchConfetti();
+  updateUI();
+}
+
+function endChallenge(won) {
+  gameState = 'done';
+  if (won) {
+    const bonus = countdownSecs * 2;
+    score += bonus;
+    updateScoreDisplay();
+    showBanner(`🏆 You did it! Final Score: ${score} pts (includes +${bonus} time bonus!)`, 'success');
+    launchConfetti();
+  } else {
+    showBanner(`⏰ Time's up! ${correctCount} / ${missingCells.length} correct. Score: ${score} pts`, 'fail');
+    revealMissing();
+  }
+  updateUI();
+}
+
+function revealAll() {
+  document.querySelectorAll('.cell-input').forEach(inp => {
+    const td = inp.parentElement;
+    if (!td.classList.contains('filled-correct')) {
+      const answer = parseInt(inp.dataset.answer);
+      td.innerHTML = answer;
+      td.className = 'data-cell';
+      td.style.color = getCellColor(answer);
+    }
+  });
+  stopAllTimers();
+  gameState = 'done';
+  showBanner(`Table revealed! ✅ ${correctCount} correct  ❌ ${wrongCount} wrong`, 'info');
+  updateUI();
+}
+
+function revealMissing() {
+  document.querySelectorAll('.data-cell.missing').forEach(td => {
+    const inp = td.querySelector('input');
+    if (inp) {
+      td.innerHTML = inp.dataset.answer;
+      td.className = 'data-cell filled-wrong';
+    }
+  });
+}
+
+function resetGame() {
+  stopAllTimers();
+  gameState = 'idle';
+  correctCount = 0; wrongCount = 0; score = 0;
+  missingCells = []; totalMissing = 0;
+  elapsedSeconds = 0; countdownSecs = 0;
+  hideBanner();
+  updateTimerDisplay();
+  updateScoreDisplay();
+  buildTable();
+  updateUI();
+  document.querySelectorAll('.stat-pill').forEach(p => p.classList.remove('timer-warn'));
+}
+
+/* ── Display helpers ── */
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-val');
+  if (!el) return;
+  if (currentMode === 'fill') {
+    const m = Math.floor(elapsedSeconds / 60), s = elapsedSeconds % 60;
+    el.textContent = m > 0 ? `${m}m ${s}s` : `${s}s`;
+  } else {
+    el.textContent = countdownSecs + 's';
+  }
+}
+
+function updateScoreDisplay() {
+  document.getElementById('correct-val').textContent = correctCount;
+  document.getElementById('wrong-val').textContent   = wrongCount;
+  /* FIX: guard — score-val only exists when visible */
+  const sv = document.getElementById('score-val');
+  if (sv) sv.textContent = score;
+}
+
+function updateMissingDisplay() {
+  const el = document.getElementById('missing-val');
+  if (el) el.textContent = totalMissing;
+}
+
+function stopAllTimers() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function showBanner(msg, type) {
+  const b = document.getElementById('message-banner');
+  b.textContent = msg;
+  b.className   = 'message-banner ' + type;
+}
+
+function hideBanner() {
+  document.getElementById('message-banner').className = 'message-banner';
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+/* ── Confetti ── */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'block';
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx    = canvas.getContext('2d');
+  const colors = ['#F59E0B','#8B5CF6','#06B6D4','#10B981','#EF4444','#FCD34D','#C4B5FD'];
+  const pieces = Array.from({length: 160}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 100,
+    r: 4 + Math.random() * 6,
+    d: 1.5 + Math.random() * 2.5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    tilt: Math.random() * 10 - 5,
+    tiltSpeed: 0.1 + Math.random() * 0.2,
+    angle: 0,
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.y += p.d; p.angle += p.tiltSpeed;
+      p.tilt = Math.sin(p.angle) * 12;
+      ctx.beginPath();
+      ctx.lineWidth   = p.r / 2;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
+      ctx.stroke();
+    });
+    frame++;
+    if (frame < 220) requestAnimationFrame(draw);
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
+  }
+  requestAnimationFrame(draw);
+}
+
+/* ── Init ── */
+initSparks();
+buildTable();
+updateUI();
+</script>
+</body>
+</html>

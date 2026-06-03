@@ -1,6 +1,7 @@
 import Unit6StudyGuide from './Unit6StudyGuide.jsx'
 import FastMath from './FastMath.jsx'
 import DivisionQuest from './DivisionQuest.jsx'
+import TimesTableChallenge from './TimesTableChallenge.jsx'
 
 // To add a new artifact:
 // 1. Drop the file into public/artifacts/ (HTML) or src/artifacts/ (JSX)
@@ -28,6 +29,13 @@ const artifacts = [
     name: 'Division Quest',
     description: 'Interactive division challenges',
     component: DivisionQuest,
+  },
+  {
+    id: 'times-table-challenge',
+    type: 'game',
+    name: 'Times Table Challenge',
+    description: 'Timed times tables challenge',
+    component: TimesTableChallenge,
   },
 ]
 
