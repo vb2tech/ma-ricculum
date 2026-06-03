@@ -311,6 +311,18 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   .table-grid{grid-template-columns:repeat(4,1fr);}
   .bubble-text{font-size:26px;}
 }
+
+/* ── bubble timer ring ── */
+.bubble-timer{
+  position:absolute;top:-14px;right:-14px;
+  width:32px;height:32px;pointer-events:none;
+}
+.bt-track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4;}
+.bt-fill{fill:none;stroke-width:4;stroke-linecap:round;
+  transform:rotate(-90deg);transform-origin:16px 16px;
+  transition:stroke .4s;
+}
+
 </style>
 </head>
 <body>
@@ -813,7 +825,8 @@ function spawnBubble(){
   if(NJ.over||NJ.bubbles.filter(b=>b.alive).length>=NJ.maxBubbles)return;
   const q=mkQ();
   const el=document.createElement('div');el.className='bubble';
-  el.innerHTML=`<div class="bubble-text">${q.a} <span class="bop">×</span> ${q.b} <span class="bop">=</span> <span style="color:var(--cyan)">?</span></div>`;
+  const _CIRC=75.4;
+  el.innerHTML=`<div class="bubble-text">${q.a} <span class="bop">×</span> ${q.b} <span class="bop">=</span> <span style="color:var(--cyan)">?</span></div><svg class="bubble-timer" viewBox="0 0 32 32"><circle class="bt-track" cx="16" cy="16" r="12"/><circle class="bt-fill" cx="16" cy="16" r="12" stroke="var(--green)" stroke-dasharray="75.4" stroke-dashoffset="0" data-btr="1"/></svg>`;
   const arena=document.getElementById('ninja-arena');arena.appendChild(el);
 
   const w=el.offsetWidth||160,h=el.offsetHeight||80;
@@ -841,7 +854,7 @@ function spawnBubble(){
   const targetY=safeTop+h+(Math.random()*(safeH-h*2));
   const dx=targetX-x, dy=targetY-y;
   const dist=Math.sqrt(dx*dx+dy*dy)||1;
-  const speed=1.2+Math.random()*1.2+(NJ.spawnCount*0.035);
+  const speed=1.4+Math.random()*1.4+(NJ.spawnCount*0.07);
   const vx=(dx/dist)*speed;
   const vy=(dy/dist)*speed;
 
@@ -849,7 +862,8 @@ function spawnBubble(){
   el.dataset.id=id;
   el.style.left=x+'px'; el.style.top=y+'px';
 
-  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false,spawnOrder:NJ.spawnCount};
+  const _tl=Math.max(2,5-Math.floor(NJ.spawnCount/5)*0.3);
+  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false,spawnOrder:NJ.spawnCount,timeLeft:_tl};
   if(NJ.easy){
     el.onclick=null;
     el.style.cursor='default';
@@ -865,7 +879,7 @@ function spawnBubble(){
 function scheduleNextSpawn(){
   if(NJ.over)return;
   // spawn interval shrinks from 3s → 1s over time
-  const interval=Math.max(1000,NJ.spawnInterval-(NJ.spawnCount*40));
+  const interval=Math.max(600,NJ.spawnInterval-(NJ.spawnCount*60));
   NJ.spawnTimer=setTimeout(()=>{spawnBubble();scheduleNextSpawn();},interval);
 }
 
@@ -1009,9 +1023,18 @@ function ninjaLoop(ts){
     bub.el.style.left=bub.x+'px';
     bub.el.style.top=bub.y+'px';
 
-    // Only escape if launched far outside (shouldn't normally happen after bounce)
-    if(bub.x>aW+60||bub.x<-bub.w-60||bub.y>aH+60||bub.y<-bub.h-60){
-      toRemove.push(bub);
+    // Bubble escape timer — pause if selected or is easy-active
+    const isActive=NJ.easy?(NJ.queue[0]===bub.id):(NJ.selectedId===bub.id);
+    if(!isActive){
+      if(!bub.startTime)bub.startTime=bub.timeLeft;
+      bub.timeLeft-=dt/1000;
+      const pct=Math.max(0,bub.timeLeft/bub.startTime);
+      const ring=bub.el.querySelector('[data-btr]');
+      if(ring){
+        ring.style.strokeDashoffset=75.4*(1-pct);
+        ring.style.stroke=pct>0.5?'var(--green)':pct>0.25?'var(--yellow)':'var(--red)';
+      }
+      if(bub.timeLeft<=0){toRemove.push(bub);return;}
     }
   });
 

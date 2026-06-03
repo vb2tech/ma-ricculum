@@ -408,6 +408,18 @@ body::after{
   font-family:'Boogaloo',cursive;font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap;
 }
 
+
+/* ── bubble timer ring ── */
+.bubble-timer{
+  position:absolute;top:-14px;right:-14px;
+  width:32px;height:32px;pointer-events:none;
+}
+.bt-track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4;}
+.bt-fill{fill:none;stroke-width:4;stroke-linecap:round;
+  transform:rotate(-90deg);transform-origin:16px 16px;
+  transition:stroke .4s;
+}
+
 </style>
 </head>
 <body>
@@ -1035,7 +1047,7 @@ function spawnBubble(){
   if(NJ.over||NJ.bubbles.filter(b=>b.alive).length>=NJ.maxBubbles)return;
   const q=mkQ();
   const el=document.createElement('div');el.className='bubble';
-  el.innerHTML=`<div class="bubble-text">${bubbleLabel(q)}</div>`;
+  el.innerHTML=`<div class="bubble-text">${bubbleLabel(q)}</div><svg class="bubble-timer" viewBox="0 0 32 32"><circle class="bt-track" cx="16" cy="16" r="12"/><circle class="bt-fill" cx="16" cy="16" r="12" stroke="var(--lime)" stroke-dasharray="75.4" stroke-dashoffset="0" data-btr="1"/></svg>`;
   document.getElementById('ninja-arena').appendChild(el);
 
   const w=el.offsetWidth||180,h=el.offsetHeight||80;
@@ -1053,14 +1065,15 @@ function spawnBubble(){
   const targetX=w+(Math.random()*(aW-w*2));
   const targetY=safeTop+h+(Math.random()*(safeH-h*2));
   const dx=targetX-x,dy=targetY-y,dist=Math.sqrt(dx*dx+dy*dy)||1;
-  const speed=1.1+Math.random()*1.1+(NJ.spawnCount*0.03);
+  const speed=1.4+Math.random()*1.4+(NJ.spawnCount*0.07);
   const vx=(dx/dist)*speed,vy=(dy/dist)*speed;
 
   const id=_bubbleCounter++;
   el.dataset.id=id;
   el.style.left=x+'px';el.style.top=y+'px';
 
-  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false,spawnOrder:NJ.spawnCount};
+  const _tl=Math.max(2,5-Math.floor(NJ.spawnCount/5)*0.3);
+  const bub={el,q,vx,vy,x,y,w,h,id,alive:true,selected:false,spawnOrder:NJ.spawnCount,timeLeft:_tl};
   if(NJ.easy){
     el.onclick=null;el.style.cursor='default';NJ.queue.push(id);
   } else {
@@ -1073,7 +1086,7 @@ function spawnBubble(){
 
 function scheduleNextSpawn(){
   if(NJ.over)return;
-  const interval=Math.max(1000,NJ.spawnInterval-(NJ.spawnCount*35));
+  const interval=Math.max(600,NJ.spawnInterval-(NJ.spawnCount*55));
   NJ.spawnTimer=setTimeout(()=>{spawnBubble();scheduleNextSpawn();},interval);
 }
 
@@ -1198,7 +1211,18 @@ function ninjaLoop(ts){
     if(bub.y<=safeTop){bub.y=safeTop;bub.vy=Math.abs(bub.vy);}
     else if(bub.y+bub.h>=aH-safeBot){bub.y=aH-safeBot-bub.h;bub.vy=-Math.abs(bub.vy);}
     bub.el.style.left=bub.x+'px';bub.el.style.top=bub.y+'px';
-    if(bub.x>aW+60||bub.x<-bub.w-60||bub.y>aH+60||bub.y<-bub.h-60)toRemove.push(bub);
+    const isActive=NJ.easy?(NJ.queue[0]===bub.id):(NJ.selectedId===bub.id);
+    if(!isActive){
+      if(!bub.startTime)bub.startTime=bub.timeLeft;
+      bub.timeLeft-=dt/1000;
+      const pct=Math.max(0,bub.timeLeft/bub.startTime);
+      const ring=bub.el.querySelector('[data-btr]');
+      if(ring){
+        ring.style.strokeDashoffset=75.4*(1-pct);
+        ring.style.stroke=pct>0.5?'var(--lime)':pct>0.25?'var(--sun)':'var(--hot)';
+      }
+      if(bub.timeLeft<=0){toRemove.push(bub);return;}
+    }
   });
 
   toRemove.forEach(bub=>{
