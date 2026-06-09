@@ -42,7 +42,7 @@ const artifacts = [
     id: 'ma-sino',
     type: 'game',
     name: 'Cashino',
-    description: 'Probability, odds & betting practice',
+    description: 'Probability and odds practice',
     component: MaSino,
   },
 ]
