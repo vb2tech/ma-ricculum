@@ -2,6 +2,7 @@ import Unit6StudyGuide from './Unit6StudyGuide.jsx'
 import FastMath from './FastMath.jsx'
 import DivisionQuest from './DivisionQuest.jsx'
 import TimesTableChallenge from './TimesTableChallenge.jsx'
+import MaSino from './MaSino.jsx'
 
 // To add a new artifact:
 // 1. Drop the file into public/artifacts/ (HTML) or src/artifacts/ (JSX)
@@ -36,6 +37,13 @@ const artifacts = [
     name: 'Times Table Challenge',
     description: 'Timed times tables challenge',
     component: TimesTableChallenge,
+  },
+  {
+    id: 'ma-sino',
+    type: 'game',
+    name: 'Cashino',
+    description: 'Probability, odds & betting practice',
+    component: MaSino,
   },
 ]
 
