@@ -171,6 +171,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .slots-wrap{background:var(--bg2);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px;border:2px solid var(--gold-dim);text-align:center}
 .slot-machine{display:inline-flex;gap:6px;background:var(--bg);padding:12px;border-radius:var(--radius);border:1px solid var(--border-bright);margin-bottom:12px}
 .slot-reel{width:62px;height:70px;border-radius:var(--radius);background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:inset 0 3px 6px rgba(0,0,0,.5)}
+.slot-cell{width:100%;aspect-ratio:1;border-radius:var(--radius);background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:inset 0 2px 5px rgba(0,0,0,.5);transition:border-color .2s,background .2s}
 .jackpot-flash{animation:jackFlash 1s ease 3}
 @keyframes jackFlash{0%,100%{border-color:var(--gold-dim)}50%{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,.5)}}
 
@@ -264,6 +265,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   .hs-row{gap:8px}
   .nav-tab{font-size:12px;padding:8px 6px}
 }
+
+/* CALCULATOR */
+.calc-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(212,175,55,.35);z-index:500;transition:transform .15s}
+.calc-fab:hover{transform:scale(1.1)}
+.calc-modal{position:fixed;bottom:86px;right:24px;width:240px;background:var(--bg3);border:1px solid var(--border-bright);border-radius:var(--radius-lg);padding:14px;z-index:501;box-shadow:0 8px 32px rgba(0,0,0,.6);display:none}
+.calc-modal.show{display:block;animation:slideUp .2s ease}
+.calc-screen{background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;text-align:right;margin-bottom:10px;min-height:52px}
+.calc-expr{font-size:11px;color:var(--text-muted);min-height:16px;word-break:break-all}
+.calc-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);word-break:break-all}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cb{padding:10px 4px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg4);color:var(--text);font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .12s;text-align:center}
+.cb:hover{background:var(--bg2)}
+.cb.op{color:var(--gold);border-color:var(--border-bright)}
+.cb.eq{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);border-color:var(--gold);grid-column:span 2}
+.cb.clr{color:#e74c3c;border-color:rgba(231,76,60,.35)}
+.cb.zero{grid-column:span 2}
 </style>
 </head>
 <body>
@@ -282,10 +299,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="login-sub">Create or continue your account. Starts you with <b style="color:var(--gold)">500 chips!</b></div>
       <div class="login-row">
         <input class="gold-input" id="name-input" type="text" placeholder="Your name..." maxlength="20"/>
-        <input class="gold-input" id="pass-input" type="password" placeholder="Password..." maxlength="30"/>
       </div>
       <button class="gold-btn gold-btn-full" onclick="loginPlayer()">Enter the Casino →</button>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:8px">New player? Just pick a name & password to create your account.</div>
       <div id="login-error" style="color:#e74c3c;font-size:13px;margin-top:8px;min-height:18px"></div>
       <div id="saved-section" class="saved-players" style="display:none">
         <div class="saved-label">Recent players:</div>
@@ -363,12 +378,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="modal-box">
     <div class="modal-icon">😬</div>
     <div class="modal-title">Out of Chips!</div>
-    <div class="modal-sub">Answer <b style="color:var(--gold)">10 math facts</b> (at least 6 multiplication) to earn <b style="color:var(--gold)">50 chips</b> back!</div>
+    <div class="modal-sub">Answer math facts to earn chips back. Each correct answer = <b style="color:var(--gold)">+50 chips</b>! At least 6 will be multiplication (1–12 times table).</div>
     <div class="math-q" id="math-q">7 × 8 = ?</div>
     <input class="math-input" id="math-input" type="number" placeholder="?"/>
     <div class="math-feedback" id="math-feedback"></div>
     <div class="math-progress" id="math-progress"></div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Correct: <span id="math-done">0</span> / 10 &nbsp;|&nbsp; Mult remaining: <span id="mult-left">6</span></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Answered: <span id="math-done">0</span> / 10 &nbsp;|&nbsp; Chips earned: <span id="chips-earned">0</span> &nbsp;|&nbsp; Mult left: <span id="mult-left">6</span></div>
     <button class="gold-btn gold-btn-full" onclick="checkMath()">Submit Answer</button>
   </div>
 </div>
@@ -389,9 +404,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <script>
+// ============ STORAGE (localStorage) ============
+function getPlayers(){return JSON.parse(localStorage.getItem('pcasino_players')||'{}');}
+function setPlayers(d){localStorage.setItem('pcasino_players',JSON.stringify(d));}
+function getMPRooms(){return JSON.parse(localStorage.getItem('pcasino_rooms')||'{}');}
+function setMPRooms(d){localStorage.setItem('pcasino_rooms',JSON.stringify(d));}
+
 // ============ CONSTANTS ============
-const MASTER_CODE = 'SQUID2024';  // ← Your master code — change this!
-const STARTING_CHIPS = 500;
+var MASTER_CODE = 'SQUID2024';
+var STARTING_CHIPS = 500;
 
 // ============ STARS ============
 (function(){
@@ -404,26 +425,26 @@ const STARTING_CHIPS = 500;
 })();
 
 // ============ STATE ============
-let player={name:'',coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0};
-let currentBet=10;let winStreak=0;let sessionHistory=[];
-let currentGame=null;let mathStreak=0;let mathAnswer=0;
-let mathMultLeft=6;let mathDone=0;let mathQueue=[];
-let masterUnlocked=false;let currentTab='lobby';
+var player={name:'',coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0};
+var currentBet=10; var winStreak=0; var sessionHistory=[];
+var currentGame=null; var mathStreak=0; var mathAnswer=0;
+var mathMultLeft=6; var mathDone=0; var mathQueue=[];
+var masterUnlocked=false; var currentTab='lobby';
 
-// ============ STORAGE ============
-function getPlayers(){return JSON.parse(localStorage.getItem('pcasino_v2_players')||'{}')}
-function savePlayers(d){localStorage.setItem('pcasino_v2_players',JSON.stringify(d))}
 function savePlayer(){
+  if(!player.name)return;
+  const hs=Math.max(player.highScore,player.coins);
+  player.highScore=hs;
   const d=getPlayers();
-  if(!d[player.name])return;
-  d[player.name].coins=player.coins;
-  d[player.name].highScore=Math.max(d[player.name].highScore,player.coins);
-  d[player.name].gamesPlayed=player.gamesPlayed;
-  d[player.name].totalWins=player.totalWins;
-  savePlayers(d);
-  document.getElementById('p-high').textContent=d[player.name].highScore;
+  d[player.name]={coins:player.coins,highScore:hs,gamesPlayed:player.gamesPlayed,totalWins:player.totalWins,kicked:player.kicked||false};
+  setPlayers(d);
+  const hel=document.getElementById('p-high');
+  if(hel)hel.textContent=hs;
 }
-function updateCoinDisplay(){document.getElementById('coin-count').textContent=player.coins;savePlayer();}
+function updateCoinDisplay(){
+  document.getElementById('coin-count').textContent=player.coins;
+  savePlayer();
+}
 
 // ============ LOGIN ============
 function initLogin(){
@@ -431,28 +452,24 @@ function initLogin(){
   const names=Object.keys(d).filter(n=>!d[n].kicked);
   if(names.length){
     document.getElementById('saved-section').style.display='block';
-    document.getElementById('saved-chips').innerHTML=names.slice(-6).map(n=>`<span class="saved-chip" onclick="quickFill('${n}')">▶ ${n}</span>`).join('');
+    document.getElementById('saved-chips').innerHTML=names.slice(-8).map(n=>`<span class="saved-chip" onclick="quickFill('${n}')">▶ ${n} · ${d[n].coins} chips</span>`).join('');
   }
-  document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pass-input').focus();});
-  document.getElementById('pass-input').addEventListener('keydown',e=>{if(e.key==='Enter')loginPlayer();});
+  document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')loginPlayer();});
 }
-function quickFill(name){document.getElementById('name-input').value=name;document.getElementById('pass-input').focus();}
+function quickFill(name){var el=document.getElementById('name-input');if(el)el.value=name;loginPlayer();}
 function loginPlayer(){
   const name=document.getElementById('name-input').value.trim();
-  const pass=document.getElementById('pass-input').value;
   const err=document.getElementById('login-error');
   if(!name){err.textContent='Please enter a name.';return;}
-  if(!pass){err.textContent='Please enter a password.';return;}
   const d=getPlayers();
   if(d[name]){
     if(d[name].kicked){err.textContent='This account has been removed by the teacher.';return;}
-    if(d[name].password!==btoa(pass)){err.textContent='Wrong password for that name.';return;}
     const pd=d[name];
-    player={name,coins:pd.coins,highScore:pd.highScore,gamesPlayed:pd.gamesPlayed||0,totalWins:pd.totalWins||0};
+    player={name,coins:pd.coins,highScore:pd.highScore||pd.coins,gamesPlayed:pd.gamesPlayed||0,totalWins:pd.totalWins||0,kicked:false};
   } else {
-    d[name]={password:btoa(pass),coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0,kicked:false};
-    savePlayers(d);
-    player={name,coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0};
+    d[name]={coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0,kicked:false};
+    setPlayers(d);
+    player={name,coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0,kicked:false};
   }
   err.textContent='';
   startSession();
@@ -461,17 +478,13 @@ function logOut(){
   savePlayer();
   player={name:'',coins:STARTING_CHIPS,highScore:STARTING_CHIPS,gamesPlayed:0,totalWins:0};
   masterUnlocked=false;
-  document.getElementById('coin-bar').style.display='none';
-  document.getElementById('nav-tabs').style.display='none';
-  document.getElementById('lobby-screen').style.display='none';
-  document.getElementById('game-screen').style.display='none';
-  document.getElementById('leaderboard-screen').style.display='none';
-  document.getElementById('mpbj-screen').style.display='none';
-  document.getElementById('master-screen').style.display='none';
+  stopMPPoll();
+  ['coin-bar','nav-tabs','lobby-screen','game-screen','leaderboard-screen','mpbj-screen','master-screen'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
   document.getElementById('tab-master').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('name-input').value='';
-  document.getElementById('pass-input').value='';
   initLogin();
 }
 function startSession(){
@@ -586,7 +599,7 @@ function payoutPanel(rows){
 }
 
 // ============ GAMES LIST ============
-const GAMES=[
+var GAMES=[
   {id:'coinflip',name:'Coin Flip',emoji:'🪙',tagline:'Heads or tails — pure 50/50',
    prob:'<div class="prob-title">The Math</div>Exactly <b>2 outcomes</b>. P(heads) = <b>1/2 = 50%</b>. Every flip is independent.',
    pillClass:'pill-green',pillLabel:'50% win'},
@@ -608,6 +621,9 @@ const GAMES=[
   {id:'highlow',name:'High or Low',emoji:'📊',tagline:'Will the next card be higher or lower?',
    prob:'<div class="prob-title">The Math</div>Live probability shown for every card. Extreme cards shift odds dramatically.',
    pillClass:'pill-green',pillLabel:'depends on card'},
+  {id:'texasholdem',name:"Texas Hold'em",emoji:'🤠',tagline:"Best 5-card hand wins the pot",
+   prob:'<div class="prob-title">The Math</div>You and 3 opponents each get 2 hole cards + 5 community cards. Best 5-card hand wins. One Pair: <b>~44%</b> · Two Pair: <b>~24%</b> · Royal Flush: <b>~0.0002%</b>.',
+   pillClass:'pill-amber',pillLabel:'skill + probability'},
   {id:'numberwheel',name:'Number Wheel',emoji:'🔢',tagline:'Pick 1–10 and spin the wheel',
    prob:'<div class="prob-title">The Math</div>P(win) = <b>1/10 = 10%</b>. Pays 8× (house edge = 2%).',
    pillClass:'pill-red',pillLabel:'10% win'},
@@ -616,7 +632,7 @@ const GAMES=[
 // ============ LOBBY ============
 function renderLobby(){
   document.getElementById('lobby-screen').className='screen';
-  const d=getPlayers()[player.name]||{};
+  // stats pulled from live player object
   const wp=player.gamesPlayed>0?Math.round(player.totalWins/player.gamesPlayed*100):0;
   document.getElementById('stats-row').innerHTML=`
     <div class="hs-card"><div class="hs-val">${player.coins}</div><div class="hs-lbl">Chips</div></div>
@@ -641,20 +657,21 @@ function loadGame(id){
   document.getElementById('game-heading').textContent=g.emoji+' '+g.name;
   document.getElementById('prob-panel').innerHTML=g.prob;
   const area=document.getElementById('game-area');
-  ({coinflip:renderCoinFlip,diceguess:renderDiceGuess,twodice:renderTwoDice,blackjack:renderBlackjack,colorbet:renderColorBet,slots:renderSlots,highlow:renderHighLow,numberwheel:renderNumberWheel})[id](area);
+  ({coinflip:renderCoinFlip,diceguess:renderDiceGuess,twodice:renderTwoDice,blackjack:renderBlackjack,colorbet:renderColorBet,slots:renderSlots,highlow:renderHighLow,numberwheel:renderNumberWheel,texasholdem:renderTexasHoldem})[id](area);
 }
 
 // ============ LEADERBOARD ============
+var lbUnsubscribe = null;
 function renderLeaderboard(){
   const d=getPlayers();
-  const entries=Object.entries(d).filter(([,v])=>!v.kicked).map(([name,v])=>({name,chips:v.coins,best:v.highScore,games:v.gamesPlayed||0,wins:v.totalWins||0}));
+  const entries=Object.entries(d).filter(([,v])=>!v.kicked).map(([name,v])=>({name,chips:v.coins,best:v.highScore||v.coins,games:v.gamesPlayed||0,wins:v.totalWins||0}));
   entries.sort((a,b)=>b.best-a.best);
   const medals=['🥇','🥈','🥉'];
   document.getElementById('lb-content').innerHTML=`
     <div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
       <table class="lb-table">
         <tr><th>#</th><th>Player</th><th>Best Chips</th><th>Current</th><th>Win Rate</th></tr>
-        ${entries.map((e,i)=>{
+        ${entries.length===0?'<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">No players yet!</td></tr>':entries.map((e,i)=>{
           const wr=e.games>0?Math.round(e.wins/e.games*100):0;
           return`<tr>
             <td><span class="lb-rank ${i<3?'r'+(i+1):''}">${i<3?medals[i]:i+1}</span></td>
@@ -668,7 +685,6 @@ function renderLeaderboard(){
     </div>`;
 }
 
-// ============ MASTER PANEL ============
 function showMasterModal(){
   document.getElementById('master-modal').classList.add('show');
   setTimeout(()=>document.getElementById('master-code-input').focus(),100);
@@ -695,17 +711,17 @@ function submitMasterCode(){
   }
 }
 function renderMaster(){
-  const d=getPlayers();
-  const entries=Object.entries(d);
+  const allPlayers=getPlayers();
+  const entries=Object.entries(allPlayers);
   document.getElementById('master-content').innerHTML=`
     <div class="mpbj-lobby" style="margin-bottom:16px">
       <div class="mpbj-title">👑 Teacher Dashboard</div>
-      <div class="mpbj-sub">Manage all player accounts. You can kick players with inappropriate names.</div>
+      <div class="mpbj-sub">Manage all player accounts. Kick players with inappropriate names — they won't be able to log back in.</div>
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Total players: <b style="color:var(--gold)">${entries.length}</b></div>
       <div class="kick-list" id="kick-list">
         ${entries.map(([name,v])=>`
-          <div class="kick-row" id="kr-${name}">
-            <span>${name}${v.kicked?'<span class="kicked-badge">Kicked</span>':''} &nbsp;<span style="color:var(--text-muted);font-size:11px">${v.coins} chips · ${v.gamesPlayed||0} games</span></span>
+          <div class="kick-row" id="kr-${CSS.escape(name)}">
+            <span>${name}${v.kicked?'<span class="kicked-badge">Kicked</span>':''} &nbsp;<span style="color:var(--text-muted);font-size:11px">${v.coins||0} chips · ${v.gamesPlayed||0} games</span></span>
             ${v.kicked
               ? `<button class="kick-btn unkick-btn" onclick="unkickPlayer('${name}')">Restore</button>`
               : `<button class="kick-btn" onclick="kickPlayer('${name}')">Kick</button>`}
@@ -725,19 +741,16 @@ function renderMaster(){
     </div>`;
 }
 function kickPlayer(name){
-  const d=getPlayers();
-  if(d[name]){d[name].kicked=true;savePlayers(d);}
+  const d=getPlayers();if(d[name]){d[name].kicked=true;setPlayers(d);}
   renderMaster();
 }
 function unkickPlayer(name){
-  const d=getPlayers();
-  if(d[name]){d[name].kicked=false;savePlayers(d);}
+  const d=getPlayers();if(d[name]){d[name].kicked=false;setPlayers(d);}
   renderMaster();
 }
 function resetPlayerChips(){
   const name=document.getElementById('reset-select').value;
-  const d=getPlayers();
-  if(d[name]){d[name].coins=STARTING_CHIPS;savePlayers(d);}
+  const d=getPlayers();if(d[name]){d[name].coins=STARTING_CHIPS;setPlayers(d);}
   document.getElementById('reset-msg').innerHTML=`<span style="color:#2ecc71">✓ Reset ${name} to ${STARTING_CHIPS} chips.</span>`;
   setTimeout(()=>{const m=document.getElementById('reset-msg');if(m)m.textContent='';},3000);
 }
@@ -773,7 +786,7 @@ function doCoin(pick){
 }
 
 // ============ DICE GUESS ============
-let dgMode='exact',dgPick=1;
+var dgMode='exact',dgPick=1;
 function renderDiceGuess(area){
   area.innerHTML=`${betHTML()}
   ${payoutPanel([
@@ -815,8 +828,8 @@ function rollDG(){
 }
 
 // ============ TWO DICE ============
-const TD_WAYS={2:1,3:2,4:3,5:4,6:5,7:6,8:5,9:4,10:3,11:2,12:1};
-let tdPick=7;
+var TD_WAYS={2:1,3:2,4:3,5:4,6:5,7:6,8:5,9:4,10:3,11:2,12:1};
+var tdPick=7;
 function renderTwoDice(area){
   const pct=(TD_WAYS[tdPick]/36*100).toFixed(1);
   const payMult=(36/TD_WAYS[tdPick]*0.75).toFixed(1);
@@ -828,7 +841,12 @@ function renderTwoDice(area){
   area.innerHTML=`${betHTML()}
   ${payoutPanel(ptRows)}
   <div class="pick-grid">${Object.keys(TD_WAYS).map(n=>`<button class="pick-btn ${tdPick==n?'selected':''}" onclick="setTdPick(${n})">${n}</button>`).join('')}</div>
-  <div style="font-size:13px;color:var(--gold-dim);margin:-4px 0 10px;text-align:center">Sum <b style="color:var(--gold)">${tdPick}</b>: ${TD_WAYS[tdPick]}/36 = <b style="color:var(--gold)">${pct}%</b> → pays <b style="color:var(--gold)">${payMult}×</b></div>
+  <div style="background:var(--bg3);border:1px solid var(--border-bright);border-radius:var(--radius);padding:12px 16px;margin:-4px 0 12px;text-align:center">
+    <div style="font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Your Pick</div>
+    <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--gold);line-height:1">${tdPick}</div>
+    <div style="font-size:20px;font-weight:600;color:var(--text);margin:4px 0">${TD_WAYS[tdPick]} / 36 = <span style="color:var(--gold)">${pct}%</span></div>
+    <div style="font-size:13px;color:var(--text-dim)">${TD_WAYS[tdPick]} way${TD_WAYS[tdPick]>1?'s':''} to roll a ${tdPick} &nbsp;·&nbsp; pays <b style="color:var(--gold)">${payMult}×</b></div>
+  </div>
   <div class="dice-area"><div class="die" id="td1">🎲</div><div class="die" id="td2">🎲</div></div>
   <div style="text-align:center;font-size:13px;color:var(--text-muted);margin-bottom:10px" id="td-sum-display">Roll the dice!</div>
   <div class="action-row"><button class="act-btn gold" onclick="rollTD()">Roll Both!</button></div>
@@ -854,7 +872,7 @@ function rollTD(){
 }
 
 // ============ BLACKJACK ============
-let bjDeck=[],bjPlayer=[],bjDealer=[],bjDone=false,bjSettled=false;
+var bjDeck=[],bjPlayer=[],bjDealer=[],bjDone=false,bjSettled=false;
 function buildDeck(){
   const faces=['2','3','4','5','6','7','8','9','10','J','Q','K','A'],suits=['♠','♥','♦','♣'];
   bjDeck=[];
@@ -867,10 +885,40 @@ function cardEl(c,down){
   if(down)return`<div class="play-card face-down" style="display:flex;align-items:center;justify-content:center;font-size:22px">🂠</div>`;
   return`<div class="play-card ${c.red?'red-card':'black-card'}"><span>${c.f}</span><div class="card-suit">${c.s}</div></div>`;
 }
+// bjBet tracks the wager chosen AFTER cards are dealt
+var bjBet=10;
 function renderBJ(){
   const el=document.getElementById('bj-inner');if(!el)return;
   const pv=bjScore(bjPlayer),dv=bjScore(bjDealer);
+  // Betting phase: cards dealt, player hasn't placed a bet yet
+  if(!bjBetPlaced){
+    el.innerHTML=`
+    <div class="cards-area">
+      <div class="cards-label">Dealer (?)</div>
+      <div class="cards-row">${bjDealer.map((c,i)=>cardEl(c,i===1)).join('')}<span class="card-score">?</span></div>
+      <div class="cards-label" style="margin-top:12px">Your Hand (${pv})</div>
+      <div class="cards-row">${bjPlayer.map(c=>cardEl(c,false)).join('')}<span class="card-score">${pv}</span></div>
+    </div>
+    <div style="background:var(--bg3);border:0.5px solid var(--border-bright);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Place Your Bet</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+        ${[5,10,25,50,100].map(v=>`<button class="chip-btn chip-${v} ${bjBet===v?'active':''}" data-v="${v}" onclick="setBJBet(${v})">${v}</button>`).join('')}
+        <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);margin-left:6px" id="bj-bet-display">${bjBet} chips</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input class="custom-bet-input" id="bj-custom-bet" type="number" min="1" max="${player.coins}" placeholder="custom" style="width:100px"/>
+        <button class="set-bet-btn" onclick="setBJCustomBet()">Set</button>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="act-btn gold" onclick="bjConfirmBet()">✓ Confirm Bet & Play</button>
+      <button class="act-btn" onclick="dealBJ()">New Hand (−10% ante)</button>
+    </div>`;
+    return;
+  }
+  // Playing phase
   el.innerHTML=`
+  <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;text-align:right">Bet: <b style="color:var(--gold)">${bjBet} chips</b></div>
   <div class="cards-area">
     <div class="cards-label">Dealer ${bjDone?'('+dv+')':'(?)'}</div>
     <div class="cards-row">${bjDealer.map((c,i)=>cardEl(c,i===1&&!bjDone)).join('')}<span class="card-score">${bjDone?dv:'?'}</span></div>
@@ -880,9 +928,25 @@ function renderBJ(){
   <div class="action-row">
     <button class="act-btn gold" onclick="bjHit()" ${bjDone?'disabled':''}>Hit</button>
     <button class="act-btn" onclick="bjStand()" ${bjDone?'disabled':''}>Stand</button>
-    <button class="act-btn" onclick="dealBJ()">New Hand</button>
+    <button class="act-btn" onclick="dealBJ()">New Hand (−5 ante)</button>
   </div>
   <div id="bj-res">${bjDone?bjResult(pv,dv):''}</div>`;
+}
+function setBJBet(v){
+  bjBet=Math.min(v,player.coins);
+  document.querySelectorAll('#bj-inner .chip-btn').forEach(b=>b.classList.toggle('active',+b.dataset.v===bjBet));
+  const d=document.getElementById('bj-bet-display');if(d)d.textContent=bjBet+' chips';
+}
+function setBJCustomBet(){
+  const v=parseInt(document.getElementById('bj-custom-bet').value);
+  if(!isNaN(v)&&v>0)setBJBet(v);
+}
+function bjConfirmBet(){
+  if(player.coins<bjBet){showBroke();return;}
+  bjBetPlaced=true;
+  renderBJ();
+  // Check instant blackjack
+  if(bjScore(bjPlayer)===21){bjDone=true;renderBJ();}
 }
 function bjResult(pv,dv){
   let msg,win,push=false;
@@ -895,38 +959,60 @@ function bjResult(pv,dv){
   if(!bjSettled){
     bjSettled=true;player.gamesPlayed++;
     if(win)player.totalWins++;
-    changeCoin(push?0:win?currentBet:-currentBet);addHistory(push?true:win);
+    changeCoin(push?0:win?bjBet:-bjBet);addHistory(push?true:win);
   }
-  return resultHTML(push?false:win,push,currentBet,msg);
+  return resultHTML(push?false:win,push,bjBet,msg);
 }
+var bjBetPlaced=false;
+var bjHandStarted=false; // true once first hand has been dealt this session
+var BJ_FIRST_ANTE=20;
+function bjAnte(){return bjHandStarted?Math.max(1,Math.floor(player.coins*0.10)):BJ_FIRST_ANTE;}
 function dealBJ(){
-  if(player.coins<currentBet){showBroke();return;}
-  buildDeck();bjDone=false;bjSettled=false;
+  const ante=bjAnte();
+  if(player.coins<ante){showBroke();return;}
+  changeCoin(-ante);
+  bjHandStarted=true;
+  buildDeck();bjDone=false;bjSettled=false;bjBetPlaced=false;
+  bjBet=Math.min(currentBet,player.coins);
   bjPlayer=[bjDraw(),bjDraw()];bjDealer=[bjDraw(),bjDraw()];
-  renderBJ();if(bjScore(bjPlayer)===21){bjDone=true;renderBJ();}
+  renderBJ();
 }
 function bjHit(){bjPlayer.push(bjDraw());if(bjScore(bjPlayer)>=21){bjDone=true;}renderBJ();}
 function bjStand(){while(bjScore(bjDealer)<17)bjDealer.push(bjDraw());bjDone=true;renderBJ();}
-function renderBlackjack(area){
-  area.innerHTML=`${betHTML()}
+function renderBlackjack(area){bjHandStarted=false;
+  area.innerHTML=`
   ${payoutPanel([
     {outcome:'Win vs dealer',prob:'~42%',pays:'1× bet',roi:'+100%',pctClass:'pct-good',highlight:true},
     {outcome:'Natural Blackjack (21)',prob:'~4.8%',pays:'1.5× bet',roi:'+150%',pctClass:'pct-good'},
     {outcome:'Push (tie)',prob:'~9%',pays:'Bet returned',roi:'0%',pctClass:'pct-mid'},
     {outcome:'Lose/Bust',prob:'~49%',pays:'Lose bet',roi:'−100%',pctClass:'pct-bad'},
   ])}
-  <div id="bj-inner"><div style="text-align:center;padding:2rem;color:var(--text-muted)">Press Deal to start</div></div>
-  <button class="act-btn gold" onclick="dealBJ()" style="width:100%;margin-top:6px">Deal Cards</button>`;
+  <div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--text-dim)">
+    🃏 <b style="color:var(--gold)">How it works:</b> Pay a 10% ante to deal. Once you see your cards, choose how much to bet, then play!
+  </div>
+  <div id="bj-inner"><div style="text-align:center;padding:2rem;color:var(--text-muted)" id="bj-placeholder">Press Deal to start</div></div>
+  <div id="bj-ante-preview" style="text-align:center;font-size:13px;color:var(--text-dim);margin-top:8px"></div>
+  <button class="act-btn gold" onclick="dealBJ()" style="width:100%;margin-top:6px" id="bj-deal-btn">Deal Cards</button>`;
+  // Update ante preview after render
+  setTimeout(()=>{
+    const el=document.getElementById('bj-ante-preview');
+    const btn=document.getElementById('bj-deal-btn');
+    if(el&&btn){
+      const a=bjAnte();
+      el.textContent='Ante: '+a+' chips (10% of your '+player.coins+' chips)';
+      btn.textContent='Deal Cards (ante: '+a+' chips)';
+    }
+  },0);
 }
 
 // ============ COLOR SPIN ============
-const COLORS=[
+var COLORS=[
   {l:'Red',pct:40,pay:1.5,emoji:'🔴',bg:'rgba(192,57,43,.15)',color:'#e74c3c',border:'rgba(192,57,43,.4)'},
   {l:'Blue',pct:25,pay:2,emoji:'🔵',bg:'rgba(36,113,163,.15)',color:'#5dade2',border:'rgba(36,113,163,.4)'},
   {l:'Gold',pct:10,pay:15,emoji:'🟡',bg:'rgba(212,175,55,.15)',color:'var(--gold)',border:'rgba(212,175,55,.4)'},
   {l:'Green',pct:25,pay:0,emoji:'🟢',bg:'rgba(39,174,96,.08)',color:'#7dcea0',border:'rgba(39,174,96,.25)'},
 ];
-let colorPick=null;
+var colorPick=null;
 function renderColorBet(area){
   area.innerHTML=`${betHTML()}
   ${payoutPanel([
@@ -961,51 +1047,122 @@ function spinColor(){
   },900);
 }
 
-// ============ SLOTS ============
-const SYMS=['🍒','⭐','🎯','💎'];
+// ============ SLOTS — 3x3 GRID ============
+// 21-stop weighted strip: diamond x1, sevens x2, others x3
+var REEL_STRIP=['🍒','🍒','🍒','🍋','🍋','🍋','🍊','🍊','🍊','⭐','⭐','⭐','🔔','🔔','🔔','🎯','🎯','🎯','7️⃣','7️⃣','💎'];
+var slotsSpinning=false;
+
+function randSym(){return REEL_STRIP[Math.floor(Math.random()*REEL_STRIP.length)];}
+function reelWindow(){
+  const start=Math.floor(Math.random()*REEL_STRIP.length);
+  return[0,1,2].map(i=>REEL_STRIP[(start+i)%REEL_STRIP.length]);
+}
+
 function renderSlots(area){
+  const ptRows=[
+    {outcome:'💎💎💎 Diamond Jackpot',prob:'(1/21)² ≈ 0.23%',pays:'100× bet',roi:'+9900%',pctClass:'pct-good',highlight:true},
+    {outcome:'7️⃣7️⃣7️⃣ Lucky Sevens',prob:'(2/21)² ≈ 0.9%',pays:'40× bet',roi:'+3900%',pctClass:'pct-good'},
+    {outcome:'⭐⭐⭐ or 🎯🎯🎯 or 🔔🔔🔔',prob:'(3/21)² ≈ 2% each',pays:'15× bet',roi:'+1400%',pctClass:'pct-good'},
+    {outcome:'🍒🍒🍒 or 🍋🍋🍋 or 🍊🍊🍊',prob:'(3/21)² ≈ 2% each',pays:'8× bet',roi:'+700%',pctClass:'pct-mid'},
+    {outcome:'Any 2 of a kind (middle row)',prob:'~24%',pays:'1.5× bet',roi:'+50%',pctClass:'pct-mid'},
+    {outcome:'No match',prob:'~70%',pays:'Lose bet',roi:'−100%',pctClass:'pct-bad'},
+  ];
   area.innerHTML=`${betHTML()}
-  ${payoutPanel([
-    {outcome:'💎💎💎 Diamond Jackpot',prob:'1/64 ≈ 1.6%',pays:'25× bet',roi:'+2400%',pctClass:'pct-good',highlight:true},
-    {outcome:'Any 3 of a kind',prob:'4/64 ≈ 6.25%',pays:'10× bet',roi:'+900%',pctClass:'pct-good'},
-    {outcome:'2 of a kind',prob:'~34%',pays:'2× bet',roi:'+100%',pctClass:'pct-good'},
-    {outcome:'No match',prob:'~66%',pays:'Lose',roi:'−100%',pctClass:'pct-bad'},
-  ])}
+  ${payoutPanel(ptRows)}
   <div class="slots-wrap">
-    <div class="slot-machine">
-      <div class="slot-reel" id="sl0">🎰</div>
-      <div class="slot-reel" id="sl1">🎰</div>
-      <div class="slot-reel" id="sl2">🎰</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;text-align:center">Middle row is the payline — see how close you were on the rows above and below!</div>
+    <div style="display:flex;gap:5px;max-width:230px;margin:0 auto 14px;position:relative" id="slot-grid">
+      <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+        <div class="slot-cell" id="sc-0-0">🎰</div><div class="slot-cell" id="sc-0-1">🎰</div><div class="slot-cell" id="sc-0-2">🎰</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+        <div class="slot-cell" id="sc-1-0">🎰</div><div class="slot-cell" id="sc-1-1">🎰</div><div class="slot-cell" id="sc-1-2">🎰</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+        <div class="slot-cell" id="sc-2-0">🎰</div><div class="slot-cell" id="sc-2-1">🎰</div><div class="slot-cell" id="sc-2-2">🎰</div>
+      </div>
+      <div id="payline-bar" style="position:absolute;left:-8px;right:-8px;top:calc(33.33% + 2px);height:calc(33.33% - 4px);border:2px solid var(--gold);border-radius:6px;pointer-events:none;box-shadow:0 0 10px rgba(212,175,55,.25);"></div>
     </div>
-    <button class="act-btn gold" style="min-width:180px;margin:0 auto;display:block" onclick="spinSlots()">🎰 Pull the Lever!</button>
+    <button class="act-btn gold" id="slot-lever" style="min-width:200px;margin:0 auto;display:block" onclick="spinSlots()">🎰 Pull the Lever!</button>
+  </div>
+  <div style="margin-top:10px;background:var(--bg3);border-radius:var(--radius);padding:9px 14px;font-size:12px;color:var(--text-muted)">
+    <b style="color:var(--gold-dim)">Symbol rarity:</b> 🍒🍋🍊 common (3/21) · ⭐🔔🎯 uncommon (3/21) · 7️⃣ rare (2/21) · 💎 legendary (1/21)
   </div>
   <div id="sl-res"></div>`;
 }
+
 function spinSlots(){
+  if(slotsSpinning)return;
   if(player.coins<currentBet){showBroke();return;}
-  const reels=[document.getElementById('sl0'),document.getElementById('sl1'),document.getElementById('sl2')];
-  let t=0;const iv=setInterval(()=>{reels.forEach(r=>r.textContent=SYMS[Math.floor(Math.random()*4)]);t++;if(t>14){clearInterval(iv);finishSlots(reels);}},90);
+  slotsSpinning=true;
+  const lever=document.getElementById('slot-lever');
+  if(lever){lever.disabled=true;lever.textContent='🎰 Spinning...';}
+  const res=document.getElementById('sl-res');if(res)res.innerHTML='';
+  for(let col=0;col<3;col++)for(let row=0;row<3;row++){
+    const c=document.getElementById('sc-'+col+'-'+row);
+    if(c){c.style.background='';c.style.borderColor='';c.classList.remove('jackpot-flash');}
+  }
+  const finalGrid=[reelWindow(),reelWindow(),reelWindow()];
+  // Each column has its OWN interval — stopping one cannot affect the others
+  const stopTimes=[1100,1900,2700];
+  for(let col=0;col<3;col++){
+    (function(c){
+      const colCells=[0,1,2].map(row=>document.getElementById('sc-'+c+'-'+row));
+      const iv=setInterval(()=>{
+        colCells.forEach(cell=>{if(cell)cell.textContent=randSym();});
+      },70);
+      setTimeout(()=>{
+        clearInterval(iv);
+        colCells.forEach((cell,row)=>{
+          if(!cell)return;
+          cell.textContent=finalGrid[c][row];
+          if(row===1){
+            cell.style.background='rgba(212,175,55,0.1)';
+            cell.style.borderColor='rgba(212,175,55,0.5)';
+          }
+        });
+        if(c===2){
+          const mid=[finalGrid[0][1],finalGrid[1][1],finalGrid[2][1]];
+          finishSlots(mid,finalGrid);
+          if(lever){lever.disabled=false;lever.textContent='🎰 Pull the Lever!';}
+          slotsSpinning=false;
+        }
+      },stopTimes[c]);
+    })(col);
+  }
 }
-function finishSlots(reels){
-  const r=reels.map(()=>SYMS[Math.floor(Math.random()*4)]);
-  reels.forEach((el,i)=>el.textContent=r[i]);player.gamesPlayed++;
-  const all3=r[0]===r[1]&&r[1]===r[2];
-  const jackpot=all3&&r[0]==='💎';
-  const two=(r[0]===r[1]||r[1]===r[2]||r[0]===r[2])&&!all3;
+
+function finishSlots(mid,grid){
+  player.gamesPlayed++;
+  const all3=mid[0]===mid[1]&&mid[1]===mid[2];
+  const jackpot=all3&&mid[0]==='💎';
+  const sevens=all3&&mid[0]==='7️⃣';
+  const highThree=all3&&(mid[0]==='⭐'||mid[0]==='🔔'||mid[0]==='🎯');
+  const lowThree=all3&&(mid[0]==='🍒'||mid[0]==='🍋'||mid[0]==='🍊');
+  const two=(mid[0]===mid[1]||mid[1]===mid[2]||mid[0]===mid[2])&&!all3;
   let pay,msg;
-  if(jackpot){pay=currentBet*25;msg='💎 JACKPOT!! Triple diamonds!';}
-  else if(all3){pay=currentBet*10;msg='🎉 Three of a kind!';}
-  else if(two){pay=currentBet*2;msg='Two matching symbols!';}
-  else{pay=-currentBet;msg='No match this time.';}
+  if(jackpot){pay=currentBet*100;msg='💎 JACKPOT!! Triple Diamonds!!';}
+  else if(sevens){pay=currentBet*40;msg='7️⃣ Lucky Sevens!! Big win!';}
+  else if(highThree){pay=currentBet*15;msg='🎉 Three '+mid[0]+'s! Great hit!';}
+  else if(lowThree){pay=currentBet*8;msg='🍒 Three of a kind!';}
+  else if(two){pay=Math.floor(currentBet*1.5);msg='Two matching! Small win!';}
+  else{pay=-currentBet;msg='No match on the payline. So close!';}
   const win=pay>0;
-  if(win)player.totalWins++;changeCoin(win?pay:-currentBet);addHistory(win);
-  if(jackpot)reels.forEach(r=>r.classList.add('jackpot-flash'));
+  if(win)player.totalWins++;
+  changeCoin(win?pay:-currentBet);
+  addHistory(win);
+  if(jackpot||sevens){
+    for(let col=0;col<3;col++){
+      const cell=document.getElementById('sc-'+col+'-1');
+      if(cell)cell.classList.add('jackpot-flash');
+    }
+  }
   document.getElementById('sl-res').innerHTML=resultHTML(win,false,win?pay:currentBet,msg);
 }
 
 // ============ HIGH OR LOW ============
-let hlCurrent=null,hlPhase='draw';
-const FACES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var hlCurrent=null,hlPhase='draw';
+var FACES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 function renderHighLow(area){
   const probHigh=hlCurrent?((13-hlCurrent)/13*100).toFixed(1):'-';
   const probLow=hlCurrent?((hlCurrent-1)/13*100).toFixed(1):'-';
@@ -1020,7 +1177,7 @@ function renderHighLow(area){
     <div style="display:flex;justify-content:center;margin:10px 0">
       ${hlCurrent?cardEl({f:FACES[hlCurrent-1],s:'♠',red:false},false):'<div class="play-card face-down" style="display:flex;align-items:center;justify-content:center;font-size:22px">🂠</div>'}
     </div>
-    ${hlCurrent?`<div style="font-size:13px;color:var(--text-dim)">Higher: <b style="color:var(--gold)">${probHigh}%</b> | Lower: <b style="color:var(--gold)">${probLow}%</b></div>`:'<div style="color:var(--text-muted);font-size:13px">Draw a card to see live probabilities!</div>'}
+    ${hlCurrent?'<div style="font-size:13px;color:var(--text-dim)">What is the probability of higher or lower? <b style="color:var(--gold)">Use your calculator to figure it out!</b></div>':'<div style="color:var(--text-muted);font-size:13px">Draw a card, then calculate your odds!</div>'}
   </div>
   <div class="action-row">
     ${hlPhase==='draw'?`<button class="act-btn gold" onclick="hlDraw()">Draw a Card</button>`:`
@@ -1044,7 +1201,7 @@ function hlGuess(dir){
 }
 
 // ============ NUMBER WHEEL ============
-let nwPick=null;
+var nwPick=null;
 function renderNumberWheel(area){
   area.innerHTML=`${betHTML()}
   ${payoutPanel([
@@ -1077,22 +1234,16 @@ function spinNW(){
 }
 
 // ============ MULTIPLAYER BLACKJACK ============
-let mpRoom=null;
-const MP_STORAGE_KEY='pcasino_mpbj_rooms';
-function getMPRooms(){return JSON.parse(localStorage.getItem(MP_STORAGE_KEY)||'{}')}
-function saveMPRooms(d){localStorage.setItem(MP_STORAGE_KEY,JSON.stringify(d))}
+var mpRoom=null;
 function genCode(){return Math.floor(1000+Math.random()*9000).toString();}
 
 function renderMPBJ(){
   const el=document.getElementById('mpbj-content');
   el.className='screen';
-  const rooms=getMPRooms();
-  const myRoom=Object.values(rooms).find(r=>r.players&&r.players.some(p=>p.name===player.name));
-  if(myRoom){renderMPRoom(myRoom.code);return;}
   el.innerHTML=`
     <div class="mpbj-lobby">
       <div class="mpbj-title">🃏 Multiplayer Blackjack</div>
-      <div class="mpbj-sub">Play live blackjack against your classmates! One person creates a room, others join with the code. All play against the same dealer.</div>
+      <div class="mpbj-sub">Play live blackjack against your classmates! One person creates a room, others join with the 4-digit code. All play against the same dealer.</div>
       <div class="action-row" style="margin-top:14px">
         <button class="act-btn gold" onclick="mpCreate()">Create Room</button>
       </div>
@@ -1110,49 +1261,47 @@ function renderMPBJ(){
 function mpCreate(){
   const code=genCode();
   const rooms=getMPRooms();
-  rooms[code]={
-    code,host:player.name,
+  rooms[code]={code,host:player.name,
     players:[{name:player.name,hand:[],status:'waiting',bet:currentBet}],
-    dealer:[],dealerDone:false,phase:'lobby',created:Date.now()
-  };
-  saveMPRooms(rooms);
+    dealer:[],dealerDone:false,phase:'lobby',created:Date.now()};
+  setMPRooms(rooms);
   mpRoom=code;
-  renderMPRoom(code);
-  // Poll for updates
-  startMPPoll();
+  startMPPoll(code);
 }
 
 function mpJoin(){
   const code=document.getElementById('mp-join-code').value.trim();
   const err=document.getElementById('mp-join-err');
   const rooms=getMPRooms();
-  if(!rooms[code]){err.textContent='Room not found. Check the code!';return;}
-  if(rooms[code].phase!=='lobby'){err.textContent='That game already started.';return;}
-  if(rooms[code].players.some(p=>p.name===player.name)){err.textContent='You\'re already in that room!';return;}
-  rooms[code].players.push({name:player.name,hand:[],status:'waiting',bet:currentBet});
-  saveMPRooms(rooms);
+  const room=rooms[code];
+  if(!room){err.textContent='Room not found. Check the code!';return;}
+  if(room.phase!=='lobby'){err.textContent='That game already started.';return;}
+  if(room.players.some(p=>p.name===player.name)){err.textContent='You\'re already in that room!';return;}
+  room.players.push({name:player.name,hand:[],status:'waiting',bet:currentBet});
+  setMPRooms(rooms);
   mpRoom=code;
-  renderMPRoom(code);
-  startMPPoll();
+  startMPPoll(code);
 }
 
-let mpPollInterval=null;
-function startMPPoll(){
+var mpPollInterval=null;
+function startMPPoll(code){
   if(mpPollInterval)clearInterval(mpPollInterval);
   mpPollInterval=setInterval(()=>{
-    if(!mpRoom||currentTab!=='mpbj')return;
     const rooms=getMPRooms();
-    if(!rooms[mpRoom])return;
-    renderMPRoom(mpRoom);
+    const room=rooms[code];
+    if(!room){mpRoom=null;clearInterval(mpPollInterval);renderMPBJ();return;}
+    renderMPRoom(room);
   },1500);
+  // render immediately too
+  const rooms=getMPRooms();if(rooms[code])renderMPRoom(rooms[code]);
 }
 function stopMPPoll(){if(mpPollInterval){clearInterval(mpPollInterval);mpPollInterval=null;}}
 
-function renderMPRoom(code){
-  const rooms=getMPRooms();
-  const room=rooms[code];
+function renderMPRoom(room){
   if(!room){mpRoom=null;renderMPBJ();return;}
+  const code=room.code;
   const el=document.getElementById('mpbj-content');
+  if(!el)return;
   const me=room.players.find(p=>p.name===player.name);
   const isHost=room.host===player.name;
   const statusColors={waiting:'st-waiting',playing:'st-playing',bust:'st-bust',stand:'st-stand',done:'st-stand'};
@@ -1161,9 +1310,9 @@ function renderMPRoom(code){
     el.innerHTML=`
       <div class="mpbj-lobby">
         <div class="mpbj-title">🃏 Room: <span style="letter-spacing:6px">${code}</span></div>
-        <div class="mpbj-sub">Share this code with your classmates! ${isHost?'Start the game when everyone\'s in.':'Waiting for host to start...'}</div>
+        <div class="mpbj-sub">${isHost?'Share this code! Start when everyone\'s in.':'Waiting for host to start...'}</div>
         <div class="mpbj-code">${code}</div>
-        <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Players in room (${room.players.length}):</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Players (${room.players.length}):</div>
         <div class="mpbj-players">${room.players.map(p=>`
           <div class="mpbj-player-chip">
             <div class="pa">${p.name[0].toUpperCase()}</div>
@@ -1171,17 +1320,15 @@ function renderMPRoom(code){
           </div>`).join('')}
         </div>
         <div class="action-row">
-          ${isHost&&room.players.length>=1?`<button class="act-btn gold" onclick="mpStartGame('${code}')">Start Game (${room.players.length} player${room.players.length>1?'s':''})</button>`:''}
+          ${isHost?`<button class="act-btn gold" onclick="mpStartGame('${code}')">Start Game (${room.players.length})</button>`:''}
           <button class="act-btn" onclick="mpLeave('${code}')">Leave Room</button>
         </div>
       </div>`;
-  } else if(room.phase==='playing'||room.phase==='dealer'){
-    const allDone=room.players.every(p=>p.status==='bust'||p.status==='stand'||p.status==='done');
-    const myTurn=room.phase==='playing'&&room.players.findIndex(p=>p.status==='playing')===room.players.indexOf(me);
+  } else if(room.phase==='playing'){
     el.innerHTML=`
       <div class="mpbj-lobby">
-        <div class="mpbj-title">🃏 Multiplayer Blackjack · Room ${code}</div>
-        <div class="mpbj-players" style="margin-bottom:14px">${room.players.map(p=>`
+        <div class="mpbj-title">🃏 Multiplayer BJ · Room ${code}</div>
+        <div class="mpbj-players" style="margin-bottom:12px">${room.players.map(p=>`
           <div class="mpbj-player-chip">
             <div class="pa">${p.name[0].toUpperCase()}</div>
             <span style="color:${p.name===player.name?'var(--gold)':'var(--text)'}">${p.name}</span>
@@ -1190,29 +1337,32 @@ function renderMPRoom(code){
           </div>`).join('')}
         </div>
         <div class="mpbj-hand">
-          <div class="mpbj-hand-title">Dealer ${room.dealerDone?'('+bjScore(room.dealer)+')':'(?)'}</div>
-          <div class="cards-row">${(room.dealer||[]).map((c,i)=>cardEl(c,i===1&&!room.dealerDone)).join('')}</div>
+          <div class="mpbj-hand-title">Dealer (?)</div>
+          <div class="cards-row">${(room.dealer||[]).map((c,i)=>cardEl(c,i===1)).join('')}</div>
         </div>
         ${room.players.map(p=>`
           <div class="mpbj-hand" style="border-color:${p.name===player.name?'var(--gold-dim)':'var(--border)'}">
-            <div class="mpbj-hand-title">${p.name==='player.name'?'★ ':''}${p.name} (${bjScore(p.hand||[])}) · bet: ${p.bet}</div>
+            <div class="mpbj-hand-title">${p.name===player.name?'★ ':''}${p.name} (${bjScore(p.hand||[])}) · bet: ${p.bet}</div>
             <div class="cards-row">${(p.hand||[]).map(c=>cardEl(c,false)).join('')}</div>
           </div>`).join('')}
         ${me&&me.status==='playing'?`
         <div class="action-row">
           <button class="act-btn gold" onclick="mpHit('${code}')">Hit</button>
           <button class="act-btn" onclick="mpStand('${code}')">Stand</button>
-        </div>`:''}
-        ${room.phase==='done'||allDone&&room.dealerDone?`<div id="mp-results">${mpResults(room)}</div>`:''}
-        <button class="act-btn" style="margin-top:10px" onclick="mpLeave('${code}')">Leave Room</button>
+        </div>`:'<div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">Waiting for your turn...</div>'}
+        <button class="act-btn" style="margin-top:8px" onclick="mpLeave('${code}')">Leave</button>
       </div>`;
   } else if(room.phase==='done'){
     el.innerHTML=`
       <div class="mpbj-lobby">
         <div class="mpbj-title">🃏 Round Complete!</div>
+        <div class="mpbj-hand" style="margin-bottom:12px">
+          <div class="mpbj-hand-title">Dealer (${bjScore(room.dealer||[])})</div>
+          <div class="cards-row">${(room.dealer||[]).map(c=>cardEl(c,false)).join('')}</div>
+        </div>
         ${mpResults(room)}
         <div class="action-row" style="margin-top:14px">
-          ${isHost?`<button class="act-btn gold" onclick="mpNewRound('${code}')">New Round</button>`:''}
+          ${isHost?`<button class="act-btn gold" onclick="mpNewRound('${code}')">New Round</button>`:'<div style="font-size:13px;color:var(--text-dim)">Waiting for host to start new round...</div>'}
           <button class="act-btn" onclick="mpLeave('${code}')">Leave Room</button>
         </div>
       </div>`;
@@ -1225,106 +1375,91 @@ function mpResults(room){
     const pv=bjScore(p.hand||[]);
     let msg,win;
     if(pv>21){msg='Bust';win=false;}
-    else if(dv>21){msg='Dealer busts — you win!';win=true;}
+    else if(dv>21){msg='Dealer busts — win!';win=true;}
     else if(pv>dv){msg='Beat the dealer!';win=true;}
     else if(pv===dv){msg='Push';win=null;}
     else{msg='Dealer wins';win=false;}
     const color=win===null?'var(--gold)':win?'#2ecc71':'#e74c3c';
     return`<div style="padding:8px 12px;background:var(--bg4);border-radius:var(--radius);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
       <span style="color:${p.name===player.name?'var(--gold)':'var(--text)'}">${p.name}: ${pv}</span>
-      <span style="color:${color};font-size:13px">${msg}</span>
+      <span style="color:${color};font-size:13px">${msg} ${win&&p.name===player.name?'(+'+p.bet+')':(!win&&win!==null&&p.name===player.name?'(−'+p.bet+')':'')}</span>
     </div>`;
   }).join('');
 }
 
-function mpDealCards(room){
-  buildDeck();
-  room.dealer=[bjDraw(),bjDraw()];
-  room.players.forEach(p=>{p.hand=[bjDraw(),bjDraw()];p.status=p.bet&&player.coins>=p.bet?'waiting':'waiting';});
-  room.players[0].status='playing';
-  room.phase='playing';
-}
-
 function mpStartGame(code){
-  const rooms=getMPRooms();
-  const room=rooms[code];
-  if(!room)return;
-  // deduct bets
+  const rooms=getMPRooms();const room=rooms[code];if(!room)return;
   room.players.forEach(p=>{if(p.name===player.name)p.bet=currentBet;});
   buildDeck();
   room.dealer=[bjDraw(),bjDraw()];
-  room.players.forEach(p=>{p.hand=[bjDraw(),bjDraw()];});
+  room.players.forEach(p=>{p.hand=[bjDraw(),bjDraw()];p.status='waiting';});
   room.players[0].status='playing';
-  room.phase='playing';
-  room.dealerDone=false;
-  saveMPRooms(rooms);
-  renderMPRoom(code);
+  room.phase='playing';room.dealerDone=false;
+  setMPRooms(rooms);renderMPRoom(room);
 }
-
 function mpHit(code){
-  const rooms=getMPRooms();const room=rooms[code];
+  const rooms=getMPRooms();const room=rooms[code];if(!room)return;
   const me=room.players.find(p=>p.name===player.name);
   if(!me||me.status!=='playing')return;
   me.hand.push(bjDraw());
-  if(bjScore(me.hand)>=21)mpAdvanceTurn(room,me);
-  saveMPRooms(rooms);renderMPRoom(code);
+  if(bjScore(me.hand)>=21)mpAdvanceTurn(rooms,room,me);
+  else{setMPRooms(rooms);renderMPRoom(room);}
 }
 function mpStand(code){
-  const rooms=getMPRooms();const room=rooms[code];
+  const rooms=getMPRooms();const room=rooms[code];if(!room)return;
   const me=room.players.find(p=>p.name===player.name);
   if(!me||me.status!=='playing')return;
   me.status='stand';
-  mpAdvanceTurn(room,me);
-  saveMPRooms(rooms);renderMPRoom(code);
+  mpAdvanceTurn(rooms,room,me);
 }
-function mpAdvanceTurn(room,me){
+function mpAdvanceTurn(rooms,room,me){
   if(bjScore(me.hand)>21)me.status='bust';
   else if(me.status!=='stand')me.status='stand';
   const next=room.players.find(p=>p.status==='waiting');
-  if(next){next.status='playing';}
-  else{
-    // Dealer plays
+  if(next){
+    next.status='playing';
+    setMPRooms(rooms);renderMPRoom(room);
+  } else {
     while(bjScore(room.dealer)<17)room.dealer.push(bjDraw());
     room.dealerDone=true;
-    // settle bets
     const dv=bjScore(room.dealer);
     room.players.forEach(p=>{
       const pv=bjScore(p.hand);
       if(p.name===player.name){
         if(pv>21){changeCoin(-p.bet);}
         else if(dv>21||pv>dv){changeCoin(p.bet);player.totalWins++;}
-        else if(pv===dv){/* push */}
-        else{changeCoin(-p.bet);}
-        player.gamesPlayed++;
+        player.gamesPlayed++;savePlayer();
       }
       p.status='done';
     });
     room.phase='done';
+    setMPRooms(rooms);renderMPRoom(room);
   }
 }
 function mpNewRound(code){
-  const rooms=getMPRooms();const room=rooms[code];
+  const rooms=getMPRooms();const room=rooms[code];if(!room)return;
   room.phase='lobby';room.dealer=[];room.dealerDone=false;
   room.players.forEach(p=>{p.hand=[];p.status='waiting';});
-  saveMPRooms(rooms);renderMPRoom(code);
+  setMPRooms(rooms);renderMPRoom(room);
 }
 function mpLeave(code){
+  stopMPPoll();
   const rooms=getMPRooms();
   if(rooms[code]){
     rooms[code].players=rooms[code].players.filter(p=>p.name!==player.name);
     if(rooms[code].players.length===0)delete rooms[code];
     else if(rooms[code].host===player.name&&rooms[code].players.length>0)rooms[code].host=rooms[code].players[0].name;
-    saveMPRooms(rooms);
+    setMPRooms(rooms);
   }
-  mpRoom=null;stopMPPoll();renderMPBJ();
+  mpRoom=null;renderMPBJ();
 }
 
 // ============ MATH BAILOUT ============
-const MATH_TOTAL=10;const MATH_MULT_MIN=6;
+var MATH_TOTAL=10; var MATH_MULT_MIN=6;
 function buildMathQueue(){
   const q=[];
   // 6+ multiplication
-  for(let i=0;i<MATH_MULT_MIN;i++){const a=2+Math.ceil(Math.random()*11);const b=2+Math.ceil(Math.random()*11);q.push({a,b,op:'×',ans:a*b});}
+  for(let i=0;i<MATH_MULT_MIN;i++){const a=Math.ceil(Math.random()*12);const b=Math.ceil(Math.random()*12);q.push({a,b,op:'×',ans:a*b});}
   // rest: mix of + and -
   const extra=MATH_TOTAL-MATH_MULT_MIN;
   for(let i=0;i<extra;i++){
@@ -1342,6 +1477,7 @@ function showBroke(){
   const prog=document.getElementById('math-progress');
   prog.innerHTML=Array.from({length:MATH_TOTAL},(_,i)=>`<div class="math-pip" id="pip${i}"></div>`).join('');
   document.getElementById('math-done').textContent=0;
+  document.getElementById('chips-earned').textContent=0;
   document.getElementById('mult-left').textContent=MATH_MULT_MIN;
   document.getElementById('math-feedback').textContent='';
   document.getElementById('math-input').value='';
@@ -1351,7 +1487,6 @@ function showBroke(){
 }
 function showNextMathQ(){
   if(mathDone>=MATH_TOTAL){
-    player.coins=50;updateCoinDisplay();
     document.getElementById('broke-modal').classList.remove('show');
     mathDone=0;return;
   }
@@ -1371,17 +1506,21 @@ function checkMath(){
   if(v===mathAnswer){
     document.getElementById('pip'+mathDone).classList.add('filled');
     mathDone++;
+    // Award 50 chips per correct answer
+    player.coins+=50;
+    if(player.coins>player.highScore)player.highScore=player.coins;
+    updateCoinDisplay();
     document.getElementById('math-done').textContent=mathDone;
+    document.getElementById('chips-earned').textContent=mathDone*50;
     fb.style.color='#2ecc71';
     if(mathDone>=MATH_TOTAL){
-      fb.textContent='✓ All done! Here are your 50 chips!';
+      fb.textContent='✓ All 10 done! You earned '+(mathDone*50)+' chips!';
       setTimeout(()=>{
-        player.coins=50;updateCoinDisplay();
         document.getElementById('broke-modal').classList.remove('show');
         mathDone=0;
-      },700);
+      },900);
     } else {
-      fb.textContent=`✓ Correct! ${MATH_TOTAL-mathDone} left...`;
+      fb.textContent=`✓ +50 chips! ${MATH_TOTAL-mathDone} question${MATH_TOTAL-mathDone!==1?'s':''} left...`;
       setTimeout(showNextMathQ,600);
     }
   } else {
@@ -1392,8 +1531,352 @@ function checkMath(){
 document.getElementById('math-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkMath();});
 document.getElementById('master-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitMasterCode();});
 
+
+// ── CALCULATOR ──
+var calcExpr='';var calcCurrent='0';var calcJustEvaled=false;
+function toggleCalc(){document.getElementById('calc-modal').classList.toggle('show');}
+function calcRefresh(){
+  document.getElementById('calc-val').textContent=calcCurrent;
+  document.getElementById('calc-expr').textContent=calcExpr;
+}
+function calcNum(n){
+  if(calcJustEvaled){calcCurrent='0';calcExpr='';calcJustEvaled=false;}
+  if(n==='.'&&calcCurrent.includes('.'))return;
+  calcCurrent=calcCurrent==='0'&&n!=='.'?n:calcCurrent+n;
+  calcRefresh();
+}
+function calcOp(op){
+  calcJustEvaled=false;
+  calcExpr=calcExpr+calcCurrent+' '+op+' ';
+  calcCurrent='0';
+  calcRefresh();
+}
+function calcClear(){calcCurrent='0';calcExpr='';calcJustEvaled=false;calcRefresh();}
+function calcBack(){
+  if(calcJustEvaled){calcClear();return;}
+  calcCurrent=calcCurrent.length>1?calcCurrent.slice(0,-1):'0';
+  calcRefresh();
+}
+function calcEquals(){
+  try{
+    const expr=(calcExpr+calcCurrent)
+      .replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-')
+      .replace(/(\d+(?:\.\d+)?)\s*%/g,'($1/100)');
+    const result=Function('"use strict";return ('+expr+')')();
+    calcExpr=calcExpr+calcCurrent+' =';
+    calcCurrent=parseFloat(result.toFixed(10)).toString();
+    calcJustEvaled=true;
+    calcRefresh();
+  } catch(e){calcCurrent='Error';calcRefresh();}
+}
+
+// ============ TEXAS HOLD'EM ============
+var thePhase=0;
+var theDeck=[],thePlayers=[],theBoard=[],thePot=0,theAnte=0,theFolded=false,theSettled=false;
+var theCurrentBet=0; // current bet level all active players must match
+var theRaiseAmt=0;   // last raise size (for re-raise minimum)
+var theActionLog=[];  // what each AI did this round
+var THE_HAND_LABELS=['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush','Royal Flush'];
+
+function buildTheDecks(){
+  var faces=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+  var suits=['♠','♥','♦','♣'];
+  theDeck=[];
+  for(var si=0;si<suits.length;si++)for(var fi=0;fi<faces.length;fi++)
+    theDeck.push({f:faces[fi],s:suits[si],red:suits[si]==='♥'||suits[si]==='♦',v:fi});
+  for(var i=theDeck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=theDeck[i];theDeck[i]=theDeck[j];theDeck[j]=tmp;}
+}
+function theDraw(){return theDeck.pop();}
+
+function renderTexasHoldem(area){
+  area.innerHTML=
+  payoutPanel([
+    {outcome:'Royal Flush',prob:'~0.0002%',pays:'200x ante',roi:'+19900%',pctClass:'pct-good',highlight:true},
+    {outcome:'Straight Flush',prob:'~0.0014%',pays:'100x ante',roi:'+9900%',pctClass:'pct-good'},
+    {outcome:'Four of a Kind',prob:'~0.024%',pays:'50x ante',roi:'+4900%',pctClass:'pct-good'},
+    {outcome:'Full House',prob:'~2.6%',pays:'10x ante',roi:'+900%',pctClass:'pct-good'},
+    {outcome:'Flush',prob:'~3%',pays:'8x ante',roi:'+700%',pctClass:'pct-good'},
+    {outcome:'Straight',prob:'~4.6%',pays:'5x ante',roi:'+400%',pctClass:'pct-mid'},
+    {outcome:'Three of a Kind',prob:'~4.8%',pays:'4x ante',roi:'+300%',pctClass:'pct-mid'},
+    {outcome:'Two Pair',prob:'~23.5%',pays:'2x ante',roi:'+100%',pctClass:'pct-mid'},
+    {outcome:'One Pair',prob:'~43.8%',pays:'1x ante',roi:'+0%',pctClass:'pct-mid'},
+    {outcome:'High Card (lose)',prob:'~17.4%',pays:'Lose ante',roi:'-100%',pctClass:'pct-bad'}
+  ])+
+  '<div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--text-dim)">'+
+  '<b style="color:var(--gold)">How to play:</b> You and Mr. V, Dice and DeeSh each get 2 hole cards. '+
+  'Check, raise, or fold each round. Best 5-card hand at showdown wins the pot!</div>'+
+  '<div id="the-inner"><div style="text-align:center;padding:2rem;color:var(--text-muted)">Set your ante and deal to start!</div></div>'+
+  betHTML()+
+  '<button class="act-btn gold" onclick="theStartHand()" style="width:100%;margin-top:6px">Deal Hand</button>';
+}
+
+function theStartHand(){
+  if(player.coins<currentBet){showBroke();return;}
+  theAnte=currentBet;
+  thePot=theAnte*4;
+  changeCoin(-theAnte);
+  buildTheDecks();
+  thePlayers=[
+    {name:'You',hand:[theDraw(),theDraw()],folded:false,bet:theAnte},
+    {name:'Mr. V',hand:[theDraw(),theDraw()],folded:false,bet:theAnte},
+    {name:'Dice',hand:[theDraw(),theDraw()],folded:false,bet:theAnte},
+    {name:'DeeSh',hand:[theDraw(),theDraw()],folded:false,bet:theAnte}
+  ];
+  theBoard=[];thePhase=1;theFolded=false;theSettled=false;
+  theCurrentBet=theAnte;theRaiseAmt=theAnte;theActionLog=[];
+  theRunAI();
+  theRender();
+}
+
+function theAIDecide(p){
+  var score=theBoard.length>=3?theEval(p.hand.concat(theBoard)):{rank:0,total:0};
+  var rank=score.rank;
+  var r=Math.random();
+  if(rank>=6){return {action:'raise',amount:theAnte*(2+Math.floor(Math.random()*3))};}
+  if(rank>=3){return r<0.4?{action:'raise',amount:theAnte*(1+Math.ceil(Math.random()))}:{action:'call'};}
+  if(r<0.15){return {action:'fold'};}
+  if(r<0.22){return {action:'raise',amount:theAnte};}
+  return {action:'call'};
+}
+
+function theRunAI(){
+  theActionLog=[];
+  for(var i=1;i<thePlayers.length;i++){
+    var p=thePlayers[i];
+    if(p.folded)continue;
+    var d=theAIDecide(p);
+    if(d.action==='fold'){
+      p.folded=true;
+      theActionLog.push(p.name+' folds');
+    } else if(d.action==='raise'){
+      theCurrentBet+=d.amount;
+      thePot+=d.amount;
+      theActionLog.push(p.name+' raises '+d.amount+' chips');
+    } else {
+      theActionLog.push(p.name+' checks');
+    }
+  }
+}
+
+function theRender(){
+  var el=document.getElementById('the-inner');if(!el)return;
+  var me=thePlayers[0];
+  var myScore=thePhase>=5?theEval(me.hand.concat(theBoard)):null;
+  var phaseLabels=['','Pre-Flop','Flop','Turn','River','Showdown'];
+  var faceDown='<div class="play-card face-down" style="width:36px;height:52px;display:flex;align-items:center;justify-content:center;font-size:16px">?</div>';
+
+  var boardHTML='';
+  if(theBoard.length>0){
+    var remaining='';
+    for(var ri=0;ri<5-theBoard.length;ri++)remaining+=faceDown;
+    boardHTML='<div style="margin-bottom:10px"><div class="cards-label">Community Cards</div>'+
+      '<div class="cards-row" style="justify-content:center">'+theBoard.map(theCardEl).join('')+remaining+'</div></div>';
+  }
+
+  var opponentsHTML='';
+  for(var oi=1;oi<thePlayers.length;oi++){
+    var p=thePlayers[oi];
+    var cardHTML=thePhase>=5&&!p.folded?p.hand.map(theCardEl).join(''):faceDown+faceDown;
+    opponentsHTML+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;opacity:'+(p.folded?0.4:1)+'">'+
+      '<div class="player-avatar" style="width:26px;height:26px;font-size:11px">'+p.name[0]+'</div>'+
+      '<span style="font-size:13px;color:'+(p.folded?'var(--text-muted)':'var(--text-dim)')+'">'+p.name+(p.folded?' (folded)':'')+'</span>'+
+      '<div class="cards-row" style="gap:4px;margin-left:auto">'+cardHTML+'</div></div>';
+  }
+
+  var logHTML='';
+  if(theActionLog.length){
+    logHTML='<div style="background:var(--bg4);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--text-dim)">'+
+      '<div style="font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Table Action</div>'+
+      theActionLog.map(function(a){return '<div>'+a+'</div>';}).join('')+'</div>';
+  }
+
+  var callAmt=Math.max(0,theCurrentBet-theAnte);
+  var actionsHTML='';
+  if(thePhase<5&&!theFolded){
+    var raiseBtns=[theAnte,theAnte*2,theAnte*3].map(function(v){
+      return '<button class="pick-btn" onclick="thePlayerRaise('+v+')">+'+v+'</button>';
+    }).join('');
+    actionsHTML=
+      '<div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px">'+
+      '<div style="font-size:12px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Your Action (Pot: '+thePot+' chips)</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'+
+      '<span style="font-size:13px;color:var(--text-dim)">Raise by:</span>'+raiseBtns+
+      '<input id="the-raise-input" type="number" class="custom-bet-input" placeholder="custom" style="width:80px" min="1"/>'+
+      '<button class="set-bet-btn" onclick="thePlayerRaiseCustom()">Raise</button></div>'+
+      '<div class="action-row" style="margin-bottom:0">'+
+      (callAmt>0?
+        '<button class="act-btn gold" onclick="thePlayerCall()">Call (+'+callAmt+' chips)</button>':
+        '<button class="act-btn gold" onclick="thePlayerCall()">Check</button>')+
+      '<button class="act-btn" style="color:#e74c3c;border-color:rgba(231,76,60,.35)" onclick="theFold()">Fold</button>'+
+      '</div></div>';
+  } else {
+    actionsHTML='<div class="action-row"><button class="act-btn gold" onclick="theStartHand()">New Hand</button></div>';
+  }
+
+  el.innerHTML=
+    '<div style="background:var(--bg3);border:0.5px solid var(--border-bright);border-radius:var(--radius);padding:8px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'+
+    '<span style="font-size:12px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px">'+(phaseLabels[thePhase]||'Showdown')+'</span>'+
+    '<span style="font-size:13px;color:var(--gold)">Pot: '+thePot+' chips</span></div>'+
+    '<div class="cards-area" style="margin-bottom:10px">'+boardHTML+
+    '<div class="cards-label">Your Hand'+(myScore?' &mdash; '+THE_HAND_LABELS[myScore.rank]:'')+'</div>'+
+    '<div class="cards-row">'+me.hand.map(theCardEl).join('')+'</div></div>'+
+    '<div style="background:var(--bg4);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px">'+
+    '<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Opponents</div>'+
+    opponentsHTML+'</div>'+logHTML+
+    (thePhase>=5?theShowdown():'')+actionsHTML;
+}
+
+function theCardEl(c){
+  return '<div class="play-card '+(c.red?'red-card':'black-card')+'"><span>'+c.f+'</span><div class="card-suit">'+c.s+'</div></div>';
+}
+
+function thePlayerCall(){
+  var callAmt=Math.max(0,theCurrentBet-theAnte);
+  if(callAmt>0){if(player.coins<callAmt){showBroke();return;}changeCoin(-callAmt);thePot+=callAmt;}
+  theAdvance();
+}
+
+function thePlayerRaise(amt){
+  if(isNaN(amt)||amt<1)return;
+  if(player.coins<amt){showBroke();return;}
+  changeCoin(-amt);thePot+=amt;theCurrentBet+=amt;theRaiseAmt=amt;
+  theActionLog.unshift('You raise '+amt+' chips');
+  theAdvance();
+}
+
+function thePlayerRaiseCustom(){
+  var inp=document.getElementById('the-raise-input');
+  if(!inp)return;
+  var v=parseInt(inp.value);
+  if(isNaN(v)||v<1)return;
+  thePlayerRaise(v);
+}
+
+function theAdvance(){
+  if(thePhase===1){theBoard=[theDraw(),theDraw(),theDraw()];thePhase=2;}
+  else if(thePhase===2){theBoard.push(theDraw());thePhase=3;}
+  else if(thePhase===3){theBoard.push(theDraw());thePhase=4;}
+  else if(thePhase===4){thePhase=5;}
+  if(thePhase<5){theCurrentBet=theAnte;theRunAI();}
+  if(thePhase===5)theResolve();
+  else theRender();
+}
+
+function theFold(){
+  theFolded=true;thePhase=5;
+  theRender();
+  var el=document.getElementById('the-inner');
+  if(el)el.insertAdjacentHTML('afterbegin',
+    '<div class="result-banner res-lose">You folded. Lost '+theAnte+' chips.'+
+    '<div class="res-sub">Sometimes folding is the smart probability move!</div></div>');
+  addHistory(false);player.gamesPlayed++;
+}
+
+function theResolve(){
+  if(theSettled)return;theSettled=true;player.gamesPlayed++;
+  var active=thePlayers.filter(function(p){return !p.folded;});
+  var scores=active.map(function(p){return {name:p.name,hand:p.hand,score:theEval(p.hand.concat(theBoard))};});
+  scores.sort(function(a,b){return b.score.total-a.score.total;});
+  var iWon=scores[0].name==='You';
+  if(iWon){changeCoin(thePot);player.totalWins++;addHistory(true);}else{addHistory(false);}
+  theRender();
+}
+
+function theShowdown(){
+  if(theFolded)return '';
+  var active=thePlayers.filter(function(p){return !p.folded;});
+  var scores=active.map(function(p){return {name:p.name,hand:p.hand,score:theEval(p.hand.concat(theBoard))};});
+  scores.sort(function(a,b){return b.score.total-a.score.total;});
+  var winner=scores[0];var iWon=winner.name==='You';
+  var myScore=null;
+  for(var i=0;i<scores.length;i++){if(scores[i].name==='You'){myScore=scores[i];break;}}
+  var html='<div class="result-banner '+(iWon?'res-win':'res-lose')+'">'+
+    (iWon?'You win the pot! +'+thePot+' chips':winner.name+' wins with '+THE_HAND_LABELS[winner.score.rank])+
+    '<div class="res-sub">'+(myScore?'Your hand: '+THE_HAND_LABELS[myScore.score.rank]:'')+'</div></div>'+
+    '<div style="background:var(--bg4);border-radius:var(--radius);padding:8px 12px;margin-bottom:8px;font-size:12px">';
+  for(var i=0;i<scores.length;i++){
+    html+='<div style="padding:2px 0;color:'+(scores[i].name==='You'?'var(--gold)':'var(--text-dim)')+'">'+
+      (i===0?'WIN ':' ')+scores[i].name+': '+THE_HAND_LABELS[scores[i].score.rank]+'</div>';
+  }
+  return html+'</div>';
+}
+
+
+// Hand evaluator — returns {rank,total} where rank 0=high card ... 9=royal flush
+function theEval(cards){
+  // Get best 5-card hand from up to 7 cards
+  const combos=theCombos(cards,5);
+  let best={rank:0,total:0};
+  for(const hand of combos){
+    const s=theScore5(hand);
+    if(s.total>best.total)best=s;
+  }
+  return best;
+}
+function theCombos(arr,k){
+  if(k===0)return[[]];
+  if(arr.length===k)return[arr];
+  const [first,...rest]=arr;
+  return [...theCombos(rest,k-1).map(c=>[first,...c]),...theCombos(rest,k)];
+}
+function theScore5(hand){
+  const vals=hand.map(c=>c.v).sort((a,b)=>b-a);
+  const suits=hand.map(c=>c.s);
+  const flush=suits.every(s=>s===suits[0]);
+  const sorted=[...vals];
+  const straight=sorted[0]-sorted[4]===4&&new Set(sorted).size===5||
+    JSON.stringify(sorted)==='[12,3,2,1,0]'; // A-2-3-4-5
+  const counts={};vals.forEach(v=>{counts[v]=(counts[v]||0)+1;});
+  const freq=Object.values(counts).sort((a,b)=>b-a);
+  let rank=0;
+  if(flush&&straight&&sorted[0]===12&&sorted[4]===8)rank=9;       // royal flush
+  else if(flush&&straight)rank=8;                                   // straight flush
+  else if(freq[0]===4)rank=7;                                       // quads
+  else if(freq[0]===3&&freq[1]===2)rank=6;                         // full house
+  else if(flush)rank=5;                                              // flush
+  else if(straight)rank=4;                                          // straight
+  else if(freq[0]===3)rank=3;                                       // trips
+  else if(freq[0]===2&&freq[1]===2)rank=2;                         // two pair
+  else if(freq[0]===2)rank=1;                                       // pair
+  // tiebreak: rank * 10000 + primary card values
+  const total=rank*100000+vals.reduce((acc,v,i)=>acc+v*Math.pow(15,4-i),0);
+  return{rank,total};
+}
+
 // ============ INIT ============
-initLogin();
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initLogin);}else{initLogin();}
 </script>
+
+<!-- FLOATING CALCULATOR -->
+<button class="calc-fab" onclick="toggleCalc()" title="Calculator">🧮</button>
+<div class="calc-modal" id="calc-modal">
+  <div class="calc-screen">
+    <div class="calc-expr" id="calc-expr"></div>
+    <div class="calc-val" id="calc-val">0</div>
+  </div>
+  <div class="calc-grid">
+    <button class="cb clr" onclick="calcClear()">C</button>
+    <button class="cb clr" onclick="calcBack()">⌫</button>
+    <button class="cb op" onclick="calcOp('%')">%</button>
+    <button class="cb op" onclick="calcOp('÷')">÷</button>
+    <button class="cb" onclick="calcNum('7')">7</button>
+    <button class="cb" onclick="calcNum('8')">8</button>
+    <button class="cb" onclick="calcNum('9')">9</button>
+    <button class="cb op" onclick="calcOp('×')">×</button>
+    <button class="cb" onclick="calcNum('4')">4</button>
+    <button class="cb" onclick="calcNum('5')">5</button>
+    <button class="cb" onclick="calcNum('6')">6</button>
+    <button class="cb op" onclick="calcOp('−')">−</button>
+    <button class="cb" onclick="calcNum('1')">1</button>
+    <button class="cb" onclick="calcNum('2')">2</button>
+    <button class="cb" onclick="calcNum('3')">3</button>
+    <button class="cb op" onclick="calcOp('+')">+</button>
+    <button class="cb" onclick="calcNum('0')" style="grid-column:span 2">0</button>
+    <button class="cb" onclick="calcNum('.')">.</button>
+    <button class="cb eq" onclick="calcEquals()">=</button>
+  </div>
+</div>
+
+
 </body>
 </html>
